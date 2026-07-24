@@ -50,11 +50,21 @@ func NewSession(
 	}, nil
 }
 
-func (s *Session) ID() string
-func (s *Session) UserID() string
-func (s *Session) TokenHash() string
-func (s *Session) CreatedAt() time.Time
-func (s *Session) ExpiresAt() time.Time
+func (s *Session) ID() string {
+	return s.id
+}
+func (s *Session) UserID() string {
+	return s.userID
+}
+func (s *Session) TokenHash() string {
+	return s.tokenHash
+}
+func (s *Session) CreatedAt() time.Time {
+	return s.createdAt
+}
+func (s *Session) ExpiresAt() time.Time {
+	return s.expiresAt
+}
 
 func (s Session) IsExpired(now time.Time) bool {
 	return now.After(s.expiresAt)
