@@ -11,7 +11,7 @@ import (
 	"github.com/AppeiYA/consultation-platform/internal/identity/usecase/dto"
 )
 
-type TestLoginUser struct {
+type testLoginUser struct {
 	userRepo              *mocks.MockUserRepository
 	sessionStore          *mocks.MockSessionStore
 	passwordHasher        *mocks.MockPasswordHasher
@@ -22,8 +22,8 @@ type TestLoginUser struct {
 	t                     *testing.T
 }
 
-func setupLoginUser(t *testing.T) TestLoginUser {
-	return TestLoginUser{
+func setupLoginUser(t *testing.T) testLoginUser {
+	return testLoginUser{
 		userRepo: &mocks.MockUserRepository{
 			FindByEmailFn: func(ctx context.Context, email domain.Email) (*domain.User, error) {
 				return nil, domain.ErrUserNotFound

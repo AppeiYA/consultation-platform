@@ -8,6 +8,9 @@ import (
 
 type Module struct {
 	RegisterUser inbound.RegisterUserInt
+	LoginUser    inbound.LoginUserInt
+	LogoutUser   inbound.LogoutUserInt
+	GetCurrentUser inbound.GetCurrentUserInt
 }
 
 func NewModule(
@@ -17,12 +20,32 @@ func NewModule(
 	idGenerator outbound.IdentifierGenerator,
 	clock outbound.Clock,
 	sessionTokenHasher outbound.SessionTokenHasher,
+	sessionTokenGenerator outbound.SessionTokenGenerator,
 ) *Module {
 	return &Module{
 		RegisterUser: usecase.NewRegisterUser(
 			userRepo,
 			passwordHasher,
 			idGenerator,
+			clock,
+		),
+		LoginUser: usecase.NewLoginUser(
+			userRepo,
+			sessionStore,
+			passwordHasher,
+			sessionTokenHasher,
+			sessionTokenGenerator,
+			idGenerator,
+			clock,
+		),
+		LogoutUser: usecase.NewLogoutUser(
+			sessionStore,
+			sessionTokenHasher,
+		),
+		GetCurrentUser: usecase.NewGetCurrentUser(
+			sessionStore,
+			sessionTokenHasher,
+			userRepo,
 			clock,
 		),
 	}
