@@ -8,6 +8,7 @@ import (
 
 	"github.com/AppeiYA/consultation-platform/internal/identity/domain"
 	"github.com/AppeiYA/consultation-platform/internal/identity/mocks"
+	"github.com/AppeiYA/consultation-platform/internal/identity/usecase/dto"
 )
 
 type TestRegisterUser struct {
@@ -18,7 +19,7 @@ type TestRegisterUser struct {
 	t              *testing.T
 }
 
-func setup(t *testing.T) TestRegisterUser {
+func setupRegisterUser(t *testing.T) TestRegisterUser {
 	return TestRegisterUser{
 		userRepo: &mocks.MockUserRepository{
 			FindByEmailFn: func(ctx context.Context, email domain.Email) (*domain.User, error) {
@@ -49,7 +50,7 @@ func setup(t *testing.T) TestRegisterUser {
 
 func TestRegisterUser_Execute(t *testing.T) {
 	now := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
-	validParams := RegisterUserParams{
+	validParams := dto.RegisterUserRequest{
 		FirstName: "John",
 		LastName:  "Doe",
 		Email:     "john.doe@example.com",
@@ -58,7 +59,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	}
 
 	t.Run("should register user successfully", func(t *testing.T) {
-		deps := setup(t)
+		deps := setupRegisterUser(t)
 		deps.clock.NowFn = func() time.Time { return now }
 
 		var savedUser *domain.User
@@ -91,7 +92,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	})
 
 	t.Run("should fail when email is invalid", func(t *testing.T) {
-		deps := setup(t)
+		deps := setupRegisterUser(t)
 		uc := NewRegisterUser(deps.userRepo, deps.passwordHasher, deps.idGenerator, deps.clock)
 
 		params := validParams
@@ -107,7 +108,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	})
 
 	t.Run("should fail when password is invalid", func(t *testing.T) {
-		deps := setup(t)
+		deps := setupRegisterUser(t)
 		uc := NewRegisterUser(deps.userRepo, deps.passwordHasher, deps.idGenerator, deps.clock)
 
 		params := validParams
@@ -123,7 +124,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	})
 
 	t.Run("should fail when role is invalid", func(t *testing.T) {
-		deps := setup(t)
+		deps := setupRegisterUser(t)
 		uc := NewRegisterUser(deps.userRepo, deps.passwordHasher, deps.idGenerator, deps.clock)
 
 		params := validParams
@@ -139,7 +140,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	})
 
 	t.Run("should fail when user already exists", func(t *testing.T) {
-		deps := setup(t)
+		deps := setupRegisterUser(t)
 		deps.userRepo.FindByEmailFn = func(ctx context.Context, email domain.Email) (*domain.User, error) {
 			existingEmail, _ := domain.NewEmail(validParams.Email)
 			existingPasswordHash := domain.NewPasswordHash("hashed")
@@ -162,7 +163,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	})
 
 	t.Run("should fail when FindByEmail returns database error", func(t *testing.T) {
-		deps := setup(t)
+		deps := setupRegisterUser(t)
 		dbErr := errors.New("database error")
 		deps.userRepo.FindByEmailFn = func(ctx context.Context, email domain.Email) (*domain.User, error) {
 			return nil, dbErr
@@ -183,7 +184,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	})
 
 	t.Run("should fail when password hashing fails", func(t *testing.T) {
-		deps := setup(t)
+		deps := setupRegisterUser(t)
 		hashErr := errors.New("hashing failed")
 		deps.passwordHasher.HashFn = func(password string) (string, error) {
 			return "", hashErr
@@ -204,7 +205,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	})
 
 	t.Run("should fail when id generation fails", func(t *testing.T) {
-		deps := setup(t)
+		deps := setupRegisterUser(t)
 		genErr := errors.New("id generation failed")
 		deps.idGenerator.GenerateFn = func() (string, error) {
 			return "", genErr
@@ -225,7 +226,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	})
 
 	t.Run("should fail when userRepo save fails", func(t *testing.T) {
-		deps := setup(t)
+		deps := setupRegisterUser(t)
 		saveErr := errors.New("save failed")
 		deps.userRepo.SaveFn = func(ctx context.Context, user *domain.User) error {
 			return saveErr

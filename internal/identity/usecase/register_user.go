@@ -16,14 +16,6 @@ type RegisterUser struct {
 	clock outbound.Clock
 }
 
-type RegisterUserParams struct {
-	FirstName string
-	LastName  string
-	Email     string
-	Password  string
-	Role      string
-}
-
 func NewRegisterUser(
 	userRepo outbound.UserRepository, 
 	passwordHasher outbound.PasswordHasher, 
@@ -38,7 +30,7 @@ func NewRegisterUser(
 	}
 }
 
-func (r *RegisterUser) Execute(ctx context.Context, params RegisterUserParams) (*dto.RegisterUserResponse, error) {
+func (r *RegisterUser) Execute(ctx context.Context, params dto.RegisterUserRequest) (*dto.RegisterUserResponse, error) {
 	email, err := domain.NewEmail(params.Email)
 	if err != nil {
 		return nil, err

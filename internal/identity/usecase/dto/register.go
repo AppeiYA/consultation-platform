@@ -1,6 +1,6 @@
 package dto
 
-type RegisterRequest struct {
+type RegisterUserRequest struct {
 	FirstName string
 	LastName  string
 	Email     string
