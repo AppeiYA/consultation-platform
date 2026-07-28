@@ -33,6 +33,7 @@ type SessionConfig struct {
     TTL         time.Duration
     Secure      bool
     HTTPOnly    bool
+	SameSite string
 }
 
 type RedisConfig struct {}

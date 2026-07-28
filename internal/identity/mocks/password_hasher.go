@@ -1,10 +1,10 @@
-package mocks 
+package mocks
 
 import "errors"
 
 type MockPasswordHasher struct {
-	HashFn func(password string) (string, error)
-	CompareFn func(hashedPassword, password string) (bool, error)
+	HashFn    func(password string) (string, error)
+	CompareFn func(password, hash string) (bool, error)
 }
 
 func (m *MockPasswordHasher) Hash(password string) (string, error) {
@@ -14,9 +14,9 @@ func (m *MockPasswordHasher) Hash(password string) (string, error) {
 	return "", errors.New("HashFn not implemented")
 }
 
-func (m *MockPasswordHasher) Compare(hashedPassword, password string) (bool, error) {
+func (m *MockPasswordHasher) Compare(password, hash string) (bool, error) {
 	if m.CompareFn != nil {
-		return m.CompareFn(hashedPassword, password)
+		return m.CompareFn(password, hash)
 	}
 	return false, errors.New("CompareFn not implemented")
 }

@@ -35,7 +35,7 @@ func setupRegisterUser(t *testing.T) testRegisterUser {
 			},
 		},
 		idGenerator: &mocks.MockIDGenerator{
-			GenerateFn: func() (string, error) {
+			GenerateFn: func(_ string) (string, error) {
 				return "user_id", nil
 			},
 		},
@@ -207,7 +207,7 @@ func TestRegisterUser_Execute(t *testing.T) {
 	t.Run("should fail when id generation fails", func(t *testing.T) {
 		deps := setupRegisterUser(t)
 		genErr := errors.New("id generation failed")
-		deps.idGenerator.GenerateFn = func() (string, error) {
+		deps.idGenerator.GenerateFn = func(_ string) (string, error) {
 			return "", genErr
 		}
 

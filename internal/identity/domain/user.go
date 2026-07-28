@@ -2,6 +2,8 @@ package domain
 
 import "time"
 
+const UserIDPrefix = "usr"
+
 type User struct {
 	id           string
 	firstName    string

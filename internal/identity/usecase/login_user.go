@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/AppeiYA/consultation-platform/internal/identity/domain"
 	"github.com/AppeiYA/consultation-platform/internal/identity/ports/outbound"
@@ -16,6 +18,7 @@ type LoginUser struct {
 	sessionTokenGenerator outbound.SessionTokenGenerator
 	idGenerator           outbound.IdentifierGenerator
 	clock                 outbound.Clock
+	sessionTTL         time.Duration 
 }
 
 func NewLoginUser(
@@ -26,6 +29,7 @@ func NewLoginUser(
 	sessionTokenGenerator outbound.SessionTokenGenerator,
 	idGenerator           outbound.IdentifierGenerator,
 	clock                 outbound.Clock,
+	sessionTTL         time.Duration,
 ) *LoginUser {
 	return &LoginUser{
 		userRepository:        userRepository,
@@ -35,6 +39,7 @@ func NewLoginUser(
 		sessionTokenGenerator: sessionTokenGenerator,
 		idGenerator:           idGenerator,
 		clock:                 clock,
+		sessionTTL:            sessionTTL,
 	}
 }
 
@@ -53,6 +58,8 @@ func (l *LoginUser) Execute(ctx context.Context, req dto.LoginRequest) (dto.Logi
 	if err != nil {
 		return dto.LoginResponse{}, err
 	}
+
+	fmt.Println(user.PasswordHash())
 
 	ok, err := l.passwordHasher.Compare(password.String(), user.PasswordHash().String())
 	if err != nil {
@@ -73,7 +80,7 @@ func (l *LoginUser) Execute(ctx context.Context, req dto.LoginRequest) (dto.Logi
 		return dto.LoginResponse{}, err
 	}
 
-	sessionID, err := l.idGenerator.Generate()
+	sessionID, err := l.idGenerator.Generate(domain.SessionIDPrefix)
 	if err != nil {
 		return dto.LoginResponse{}, err
 	}
@@ -81,9 +88,11 @@ func (l *LoginUser) Execute(ctx context.Context, req dto.LoginRequest) (dto.Logi
 	session, err := domain.NewSession(
 		sessionID,
 		user.ID(),
+		user.Email().String(),
+		user.Role().String(),
 		hash,
 		l.clock.Now(),
-		7,
+		l.sessionTTL,
 	)
 	if err != nil {
 		return dto.LoginResponse{}, err

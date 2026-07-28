@@ -58,14 +58,14 @@ func setupLoginUser(t *testing.T) testLoginUser {
 				return "hashed_password", nil
 			},
 			CompareFn: func(
-				hashedPassword string,
 				password string,
+				hash string,
 			) (bool, error) {
-				return hashedPassword == password, nil
+				return hash == password, nil
 			},
 		},
 		idGenerator: &mocks.MockIDGenerator{
-			GenerateFn: func() (string, error) {
+			GenerateFn: func(_ string) (string, error) {
 				return "user_id", nil
 			},
 		},
@@ -80,6 +80,7 @@ func setupLoginUser(t *testing.T) testLoginUser {
 
 func TestLoginUser_Execute(t *testing.T) {
 	now := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
+	sessionTTL := 24 * time.Hour
 	validParams := dto.LoginRequest{
 		Email:    "appeimisic@gmail.com",
 		Password: "testLogin123$",
@@ -109,8 +110,8 @@ func TestLoginUser_Execute(t *testing.T) {
 		}
 
 		deps.passwordHasher.CompareFn = func(
-			hashed string,
 			plain string,
+			hashed string,
 		) (bool, error) {
 			return true, nil
 		}
@@ -136,6 +137,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		result, err := uc.Execute(context.Background(), validParams)
@@ -163,6 +165,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		_, err := uc.Execute(context.Background(), invalidEmailReq)
@@ -184,6 +187,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		_, err := uc.Execute(context.Background(), invalidPasswordReq)
@@ -206,6 +210,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		_, err := uc.Execute(context.Background(), validParams)
@@ -224,7 +229,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			return domain.NewUser("user_id", "John", "Doe", email, domain.NewPasswordHash("hashed_password"), role, now), nil
 		}
 		compareErr := errors.New("compare failed")
-		deps.passwordHasher.CompareFn = func(hashedPassword, password string) (bool, error) {
+		deps.passwordHasher.CompareFn = func(password, hash string) (bool, error) {
 			return false, compareErr
 		}
 
@@ -236,6 +241,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		_, err := uc.Execute(context.Background(), validParams)
@@ -253,7 +259,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			role, _ := domain.NewRole("CLIENT")
 			return domain.NewUser("user_id", "John", "Doe", email, domain.NewPasswordHash("hashed_password"), role, now), nil
 		}
-		deps.passwordHasher.CompareFn = func(hashedPassword, password string) (bool, error) {
+		deps.passwordHasher.CompareFn = func(password, hash string) (bool, error) {
 			return false, nil
 		}
 
@@ -265,6 +271,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		_, err := uc.Execute(context.Background(), validParams)
@@ -282,7 +289,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			role, _ := domain.NewRole("CLIENT")
 			return domain.NewUser("user_id", "John", "Doe", email, domain.NewPasswordHash("hashed_password"), role, now), nil
 		}
-		deps.passwordHasher.CompareFn = func(hashedPassword, password string) (bool, error) {
+		deps.passwordHasher.CompareFn = func(password, hash string) (bool, error) {
 			return true, nil
 		}
 		genErr := errors.New("token generation failed")
@@ -298,6 +305,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		_, err := uc.Execute(context.Background(), validParams)
@@ -315,7 +323,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			role, _ := domain.NewRole("CLIENT")
 			return domain.NewUser("user_id", "John", "Doe", email, domain.NewPasswordHash("hashed_password"), role, now), nil
 		}
-		deps.passwordHasher.CompareFn = func(hashedPassword, password string) (bool, error) {
+		deps.passwordHasher.CompareFn = func(password, hash string) (bool, error) {
 			return true, nil
 		}
 		validToken, _ := domain.NewSessionToken("12345678901234567890123456789012")
@@ -335,6 +343,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		_, err := uc.Execute(context.Background(), validParams)
@@ -352,7 +361,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			role, _ := domain.NewRole("CLIENT")
 			return domain.NewUser("user_id", "John", "Doe", email, domain.NewPasswordHash("hashed_password"), role, now), nil
 		}
-		deps.passwordHasher.CompareFn = func(hashedPassword, password string) (bool, error) {
+		deps.passwordHasher.CompareFn = func(password, hash string) (bool, error) {
 			return true, nil
 		}
 		validToken, _ := domain.NewSessionToken("12345678901234567890123456789012")
@@ -363,7 +372,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			return "hashed_token", nil
 		}
 		idGenErr := errors.New("session ID generation failed")
-		deps.idGenerator.GenerateFn = func() (string, error) {
+		deps.idGenerator.GenerateFn = func(_ string) (string, error) {
 			return "", idGenErr
 		}
 
@@ -375,6 +384,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		_, err := uc.Execute(context.Background(), validParams)
@@ -392,7 +402,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			role, _ := domain.NewRole("CLIENT")
 			return domain.NewUser("user_id", "John", "Doe", email, domain.NewPasswordHash("hashed_password"), role, now), nil
 		}
-		deps.passwordHasher.CompareFn = func(hashedPassword, password string) (bool, error) {
+		deps.passwordHasher.CompareFn = func(password, hash string) (bool, error) {
 			return true, nil
 		}
 		validToken, _ := domain.NewSessionToken("12345678901234567890123456789012")
@@ -415,6 +425,7 @@ func TestLoginUser_Execute(t *testing.T) {
 			deps.sessionTokenGenerator,
 			deps.idGenerator,
 			deps.clock,
+			sessionTTL,
 		)
 
 		_, err := uc.Execute(context.Background(), validParams)

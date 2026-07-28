@@ -1,6 +1,8 @@
 package identity
 
 import (
+	"time"
+
 	"github.com/AppeiYA/consultation-platform/internal/identity/ports/inbound"
 	"github.com/AppeiYA/consultation-platform/internal/identity/ports/outbound"
 	"github.com/AppeiYA/consultation-platform/internal/identity/usecase"
@@ -10,6 +12,7 @@ type Module struct {
 	RegisterUser inbound.RegisterUserInt
 	LoginUser    inbound.LoginUserInt
 	LogoutUser   inbound.LogoutUserInt
+	ValidateSession inbound.ValidateSessionInt
 	GetCurrentUser inbound.GetCurrentUserInt
 }
 
@@ -21,6 +24,7 @@ func NewModule(
 	clock outbound.Clock,
 	sessionTokenHasher outbound.SessionTokenHasher,
 	sessionTokenGenerator outbound.SessionTokenGenerator,
+	sessionTTL time.Duration,
 ) *Module {
 	return &Module{
 		RegisterUser: usecase.NewRegisterUser(
@@ -37,16 +41,19 @@ func NewModule(
 			sessionTokenGenerator,
 			idGenerator,
 			clock,
+			sessionTTL,
 		),
 		LogoutUser: usecase.NewLogoutUser(
 			sessionStore,
 			sessionTokenHasher,
 		),
-		GetCurrentUser: usecase.NewGetCurrentUser(
+		ValidateSession: usecase.NewValidateSession(
 			sessionStore,
 			sessionTokenHasher,
-			userRepo,
 			clock,
+		),
+		GetCurrentUser: usecase.NewGetCurrentUser(
+			userRepo,
 		),
 	}
 }

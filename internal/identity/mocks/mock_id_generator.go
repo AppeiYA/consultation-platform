@@ -1,9 +1,9 @@
 package mocks
 
 type MockIDGenerator struct {
-	GenerateFn func() (string, error)
+	GenerateFn func(prefix string) (string, error)
 }
 
-func (m *MockIDGenerator) Generate() (string, error) {
-	return m.GenerateFn()
+func (m *MockIDGenerator) Generate(prefix string) (string, error) {
+	return m.GenerateFn(prefix)
 }

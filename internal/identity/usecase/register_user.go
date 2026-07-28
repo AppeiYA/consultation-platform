@@ -62,7 +62,7 @@ func (r *RegisterUser) Execute(ctx context.Context, params dto.RegisterUserReque
 		return nil, err
 	}
 
-	userID, err := r.idGenerator.Generate()
+	userID, err := r.idGenerator.Generate(domain.UserIDPrefix)
 	if err != nil {
 		return nil, err
 	}

@@ -1,5 +1,5 @@
 package outbound
 
 type IdentifierGenerator interface {
-	Generate() (string, error)
+	Generate(prefix string) (string, error)
 }

@@ -1,7 +1,7 @@
 package dto
 
 type GetCurrentUserRequest struct {
-	SessionToken string 
+	UserID string
 }
 
 type GetCurrentUserResponse struct {

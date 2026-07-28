@@ -1,6 +1,10 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 func SetupConfig() *Config {
 	app := appConfig()
@@ -22,7 +26,7 @@ func appConfig() AppConfig {
 func httpConfig() HttpConfig {
 	return HttpConfig{
 		Host: getEnv("HTTP_HOST", "localhost"),
-		Port: getEnvInt("HTTP_PORT", 3333),
+		Port: getEnvInt("HTTP_PORT", 8080),
 	}
 }
 
@@ -35,9 +39,10 @@ func sessionConfig(app_env string) SessionConfig {
 	}
 	return SessionConfig{
 		CookieName: getEnv("SESSION_COOKIE_NAME", "session_id"),
-		TTL: getEnvDuration("SESSION_TTL", 24 * time.Hour),
-		Secure: secure,
-		HTTPOnly: httpOnly,
+		TTL:        getEnvDuration("SESSION_TTL", 24*time.Hour),
+		Secure:     secure,
+		HTTPOnly:   httpOnly,
+		SameSite:   fiber.CookieSameSiteLaxMode,
 	}
 }
 
