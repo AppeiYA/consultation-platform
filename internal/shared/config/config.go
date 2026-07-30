@@ -21,7 +21,18 @@ type AppConfig struct {
     Env  string
 }
 
-type DatabaseConfig struct {}
+type DatabaseConfig struct {
+	Host string
+	Port int
+	User string
+	Password string
+	Name string
+	SSLMode string
+	Schema string
+	MaxOpenConnections int
+	MaxIdleConnections int
+	MaxLifetimeMinutes int
+}
 
 type HttpConfig struct {
 	Host string
@@ -36,7 +47,12 @@ type SessionConfig struct {
 	SameSite string
 }
 
-type RedisConfig struct {}
+type RedisConfig struct {
+	Address string
+	Username string
+	Password string
+	DB int
+}
 type AIConfig struct {}
 type PaymentConfig struct {}
 type LoggerConfig struct {

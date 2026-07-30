@@ -68,6 +68,34 @@ func NewSession(
 	}, nil
 }
 
+func ReconstituteSession(
+	id string,
+	userID string,
+	email string,
+	role string,
+	tokenHash string,
+	createdAt time.Time,
+	expiresAt time.Time,
+) (*Session, error) {
+	address, err := NewEmail(email)
+	if err != nil {
+		return nil, errInvalidEmail
+	}
+	userRole, err := NewRole(role)
+	if err != nil {
+		return nil, errInvalidRole
+	}
+	return &Session{
+		id:        id,
+		userID:    userID,
+		email: address.String(),
+		role: userRole.String(),
+		tokenHash: tokenHash,
+		createdAt: createdAt,
+		expiresAt: expiresAt,
+	}, nil
+}
+
 func (s *Session) ID() string {
 	return s.id
 }

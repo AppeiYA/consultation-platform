@@ -10,4 +10,5 @@ var (
 	ErrInvalidPassword  = custom_errors.UnauthorizedException("invalid password")
 	ErrSessionNotFound  = custom_errors.NotFoundError("session not found")
 	ErrSessionExpired = custom_errors.UnauthorizedException("session expired")
+	ErrUserIsDeleted = custom_errors.BadException("user is deleted")
 )

@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/AppeiYA/consultation-platform/internal/identity/domain"
@@ -58,8 +57,6 @@ func (l *LoginUser) Execute(ctx context.Context, req dto.LoginRequest) (dto.Logi
 	if err != nil {
 		return dto.LoginResponse{}, err
 	}
-
-	fmt.Println(user.PasswordHash())
 
 	ok, err := l.passwordHasher.Compare(password.String(), user.PasswordHash().String())
 	if err != nil {

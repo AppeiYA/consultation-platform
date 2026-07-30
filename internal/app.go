@@ -17,7 +17,9 @@ import (
 	"github.com/AppeiYA/consultation-platform/internal/shared/adapters/id/uuid"
 	system "github.com/AppeiYA/consultation-platform/internal/shared/adapters/outbound/clock"
 	"github.com/AppeiYA/consultation-platform/internal/shared/config"
+	"github.com/AppeiYA/consultation-platform/internal/shared/db"
 	"github.com/AppeiYA/consultation-platform/internal/shared/logger"
+	"github.com/AppeiYA/consultation-platform/internal/shared/redis"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -34,6 +36,16 @@ type App struct {
 
 func New() (*App, error) {
 	cfg := config.SetupConfig()
+	database, err := db.Connect(cfg.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	redisPK, err := redis.Connect(cfg.Redis)
+	if err != nil {
+		return nil, err
+	}
+
 	logger.Init(cfg)
 
 	a := &App{
@@ -70,8 +82,11 @@ func New() (*App, error) {
 	cookieManager := shared_http.NewCookieManager(cfg.Session)
 	idGenerator := uuid.NewGenerator()
 	clock := system.NewSystemClock()
+	repository := db.NewRepository(database)
 
 	a.registerIdentity(
+		repository,
+		redisPK,
 		clock,
 		idGenerator,
 		cookieManager,

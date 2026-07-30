@@ -44,7 +44,7 @@ func (m *AuthenticationMiddleware) Authenticate(c *fiber.Ctx) error {
 		return response.Error(c, shared_http.StatusFor(err), "User is unauthorized", nil)
 	}
 
-	c.Locals(ContextClaimKey, claims.SessionClaims)
+	c.Locals(ContextClaimKey, &claims.SessionClaims)
 
 	return c.Next()	
 }

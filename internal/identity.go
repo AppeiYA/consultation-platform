@@ -7,23 +7,28 @@ import (
 	identity_http "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http"
 	identity_auth_middleware "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http/middleware"
 	"github.com/AppeiYA/consultation-platform/internal/identity/adapters/outbound/bcrypt"
-	identity_memory "github.com/AppeiYA/consultation-platform/internal/identity/adapters/outbound/memory"
+	identity_postgres "github.com/AppeiYA/consultation-platform/internal/identity/adapters/outbound/postgres"
 	"github.com/AppeiYA/consultation-platform/internal/identity/adapters/outbound/random"
+	"github.com/AppeiYA/consultation-platform/internal/identity/adapters/outbound/redis"
 	"github.com/AppeiYA/consultation-platform/internal/identity/adapters/outbound/sha256"
 	shared_http "github.com/AppeiYA/consultation-platform/internal/shared/adapters/http"
 	"github.com/AppeiYA/consultation-platform/internal/shared/adapters/id/uuid"
 	system "github.com/AppeiYA/consultation-platform/internal/shared/adapters/outbound/clock"
+	"github.com/AppeiYA/consultation-platform/internal/shared/db"
+	shared_redis "github.com/AppeiYA/consultation-platform/internal/shared/redis"
 )
 
 func (a *App) registerIdentity(
+	db db.Repository,
+	redisPK *shared_redis.Redis,
 	clock *system.SystemClock,
 	idGenerator *uuid.Generator,
 	cookieManager shared_http.CookieManagerInt,
 	sessionTTL time.Duration,
 ) {
 	// Identity
-	userRepo := identity_memory.NewUserRepository()
-	sessionStore := identity_memory.NewSessionStore()
+	userRepo := identity_postgres.NewUserRepository(db, clock)
+	sessionStore := redis.NewSessionStore(redisPK, clock)
 
 	passwordHasher := bcrypt.NewHasher()
 	sessionTokenHasher := sha256.NewHasher()
