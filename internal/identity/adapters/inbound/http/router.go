@@ -10,6 +10,7 @@ func SetUpRouter(router fiber.Router, h *IdentityHandler, m *middleware.Authenti
 
 	identity.Post("/register", h.Register)
 	identity.Post("/login", h.Login)
+	identity.Post("/logout", h.Logout)
 
 	protected := identity.Use(m.Authenticate)
 
