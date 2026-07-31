@@ -11,7 +11,7 @@ import (
 func testRedis(t *testing.T) *shared_redis.Redis {
     t.Helper()
 
-    cfg := config.SetupConfig()
+    cfg := config.SetupTestConfig()
 
     rdb, err := shared_redis.Connect(cfg.Redis)
     if err != nil {

@@ -25,7 +25,7 @@ type TestHarness struct {
 
 func setUpIdentityApp(t *testing.T) *TestHarness {
 	t.Helper()
-	cfg := config.SetupConfig()
+	cfg := config.SetupTestConfig()
 
 	// Infrastructure
 	db := testPostgres(t)

@@ -108,7 +108,7 @@ func TestLogoutUser_Integration(t *testing.T) {
 			http.MethodPost,
 			"/test/v1/identity/logout",
 			nil,
-			"session_id=invalid_token",
+			"test_session_id=invalid_token",
 		)
 		require.NoError(t, err)
 		defer resp.Body.Close()

@@ -15,7 +15,7 @@ var tables = []string{"users"}
 func testPostgres(t *testing.T) *shared_db.Repository {
 	t.Helper()
 
-	cfg := config.SetupConfig()
+	cfg := config.SetupTestConfig()
 
 	db, err := shared_db.Connect(cfg.Database)
 	if err != nil {

@@ -108,7 +108,7 @@ func TestGetMe_Integration(t *testing.T) {
 			http.MethodGet,
 			"/test/v1/identity/me",
 			nil,
-			"session_id=invalid_token_12345678901234567890123456789012",
+			"test_session_id=invalid_token_12345678901234567890123456789012",
 		)
 		require.NoError(t, err)
 		defer resp.Body.Close()
