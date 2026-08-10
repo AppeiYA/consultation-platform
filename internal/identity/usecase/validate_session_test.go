@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/AppeiYA/consultation-platform/internal/identity/domain"
+	shared_mocks "github.com/AppeiYA/consultation-platform/internal/shared/mocks"
 	"github.com/AppeiYA/consultation-platform/internal/identity/mocks"
 	"github.com/AppeiYA/consultation-platform/internal/identity/usecase/dto"
 )
@@ -16,7 +17,7 @@ type validateSessionTest struct {
 
 	sessionStore       *mocks.MockSessionStore
 	sessionTokenHasher *mocks.MockSessionTokenHasher
-	clock              *mocks.MockClock
+	clock              *shared_mocks.MockClock
 }
 
 func setupValidateSessionTest(t *testing.T) *validateSessionTest {
@@ -34,7 +35,7 @@ func setupValidateSessionTest(t *testing.T) *validateSessionTest {
 		},
 	}
 
-	clock := &mocks.MockClock{
+	clock := &shared_mocks.MockClock{
 		NowFn: func() time.Time {
 			return time.Now()
 		},

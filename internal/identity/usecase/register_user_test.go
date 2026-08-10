@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/AppeiYA/consultation-platform/internal/identity/domain"
+	shared_mocks "github.com/AppeiYA/consultation-platform/internal/shared/mocks"
 	"github.com/AppeiYA/consultation-platform/internal/identity/mocks"
 	"github.com/AppeiYA/consultation-platform/internal/identity/usecase/dto"
 )
@@ -14,8 +15,8 @@ import (
 type testRegisterUser struct {
 	userRepo       *mocks.MockUserRepository
 	passwordHasher *mocks.MockPasswordHasher
-	idGenerator    *mocks.MockIDGenerator
-	clock          *mocks.MockClock
+	idGenerator    *shared_mocks.MockIDGenerator
+	clock          *shared_mocks.MockClock
 	t              *testing.T
 }
 
@@ -34,12 +35,12 @@ func setupRegisterUser(t *testing.T) testRegisterUser {
 				return "hashed_password", nil
 			},
 		},
-		idGenerator: &mocks.MockIDGenerator{
+		idGenerator: &shared_mocks.MockIDGenerator{
 			GenerateFn: func(_ string) (string, error) {
 				return "user_id", nil
 			},
 		},
-		clock: &mocks.MockClock{
+		clock: &shared_mocks.MockClock{
 			NowFn: func() time.Time {
 				return time.Now()
 			},

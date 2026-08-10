@@ -11,3 +11,7 @@ func NewYearsExperience(years int) (YearsExperience, error) {
 
 	return YearsExperience{value: years}, nil
 }
+
+func (y YearsExperience) Int() int {
+	return y.value
+}

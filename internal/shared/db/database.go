@@ -23,3 +23,7 @@ func (db *DB) Ping(ctx context.Context) error {
 func (db *DB) Close() error {
 	return db.conn.Close()
 }
+
+func (db *DB) Conn() *sqlx.DB {
+	return db.conn
+}

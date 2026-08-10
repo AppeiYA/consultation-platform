@@ -6,11 +6,10 @@ import (
 	shared_http "github.com/AppeiYA/consultation-platform/internal/shared/adapters/http"
 	"github.com/AppeiYA/consultation-platform/internal/shared/logger"
 	"github.com/AppeiYA/consultation-platform/internal/shared/response"
+	"github.com/AppeiYA/consultation-platform/internal/shared/session"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
-
-const ContextClaimKey = "identity.claim"
 
 type AuthenticationMiddleware struct {
 	identityModule *identity.Module
@@ -44,7 +43,11 @@ func (m *AuthenticationMiddleware) Authenticate(c *fiber.Ctx) error {
 		return response.Error(c, shared_http.StatusFor(err), "User is unauthorized", nil)
 	}
 
-	c.Locals(ContextClaimKey, &claims.SessionClaims)
+	c.Locals(session.ContextClaimsKey, &session.Claims{
+		UserID: claims.SessionClaims.UserID,
+		Email:  claims.SessionClaims.Email,
+		Role:   claims.SessionClaims.Role,
+	})
 
 	return c.Next()	
 }

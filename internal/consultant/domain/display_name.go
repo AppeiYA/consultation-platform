@@ -23,6 +23,10 @@ func NewDisplayName(displayName string) (DisplayName, error) {
 	return DisplayName{value: value}, nil
 }
 
+func (d DisplayName) String() string {
+	return d.value
+}
+
 func isAlphanumericRegex(s string) bool {
 	re := regexp.MustCompile(`^[a-zA-Z0-9 ]+$`)
 	return re.MatchString(s)

@@ -15,6 +15,8 @@ type TestConfigOption func(*Config)
 // It defaults to isolated resources (e.g., consultation_platform_test DB, Redis DB index 15)
 // and enforces strict safety checks to prevent tests from executing against production resources.
 func SetupTestConfig(opts ...TestConfigOption) *Config {
+	loadDotEnv()
+
 	cfg := &Config{
 		App: AppConfig{
 			Name: getEnv("TEST_APP_NAME", "CONSULTANT_SYSTEM_TEST"),
@@ -38,10 +40,10 @@ func SetupTestConfig(opts ...TestConfigOption) *Config {
 			Host:               getEnv("TEST_DB_HOST", getEnv("DB_HOST", "localhost")),
 			Port:               getEnvInt("TEST_DB_PORT", getEnvInt("DB_PORT", 5432)),
 			User:               getEnv("TEST_DB_USER", getEnv("DB_USER", "peterpaul")),
-			Password:           getEnv("TEST_DB_PASSWORD", getEnv("DB_PASSWORD", "Appei2004")),
+			Password:           getEnv("TEST_DB_PASSWORD", getEnv("DB_PASSWORD", "")),
 			Name:               getEnv("TEST_DB_NAME", "consultation_platform_test"),
-			SSLMode:            getEnv("TEST_DB_SSLMODE", "disable"),
-			Schema:             getEnv("TEST_DB_SCHEMA", "consultation"),
+			SSLMode:            getEnv("TEST_DB_SSLMODE", getEnv("DB_SSLMODE", "disable")),
+			Schema:             getEnv("TEST_DB_SCHEMA", getEnv("DB_SCHEMA", "consultation")),
 			MaxOpenConnections: getEnvInt("TEST_DB_MAX_OPEN_CONNECTIONS", 10),
 			MaxIdleConnections: getEnvInt("TEST_DB_MAX_IDLE_CONNECTIONS", 5),
 			MaxLifetimeMinutes: getEnvInt("TEST_DB_MAX_LIFETIME_MINUTES", 5),

@@ -24,6 +24,18 @@ func TestSetupTestConfig_Defaults(t *testing.T) {
 	}
 }
 
+func TestLoadDotEnv_LoadsFromRoot(t *testing.T) {
+	cfg := SetupConfig()
+
+	if cfg.Database.User != "peterpaul" {
+		t.Errorf("expected DB User 'peterpaul' from .env, got %s", cfg.Database.User)
+	}
+
+	if cfg.Database.Password != "Appei2004" {
+		t.Errorf("expected DB Password 'Appei2004' from .env, got %s", cfg.Database.Password)
+	}
+}
+
 func TestSetupTestConfig_FunctionalOptions(t *testing.T) {
 	cfg := SetupTestConfig(
 		WithTestDatabaseName("custom_db_test"),

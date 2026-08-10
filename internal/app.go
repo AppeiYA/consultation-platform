@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/AppeiYA/consultation-platform/internal/consultant"
+	consultant_http "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/inbound/http"
 	"github.com/AppeiYA/consultation-platform/internal/identity"
 	identity_http "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http"
 	identity_auth_middleware "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http/middleware"
@@ -32,6 +34,9 @@ type App struct {
 	identityModule *identity.Module
 	identityHandler *identity_http.IdentityHandler
 	identityAuthMiddleware *identity_auth_middleware.AuthenticationMiddleware
+
+	consultantModule *consultant.Module
+	consultantHandler *consultant_http.ConsultantHandler
 }
 
 func New() (*App, error) {
@@ -84,6 +89,7 @@ func New() (*App, error) {
 	clock := system.NewSystemClock()
 	repository := db.NewRepository(database)
 
+	// identity
 	a.registerIdentity(
 		repository,
 		redisPK,
@@ -91,6 +97,13 @@ func New() (*App, error) {
 		idGenerator,
 		cookieManager,
 		cfg.Session.TTL,
+	)
+
+	// consultant
+	a.registerConsultantModule(
+		repository,
+		clock,
+		idGenerator,
 	)
 
 	SetUpRouter(a)

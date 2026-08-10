@@ -15,3 +15,7 @@ func NewBio(bio string) (Bio, error) {
 
 	return Bio{value: bio}, nil
 }
+
+func (b Bio) String() string {
+	return b.value
+}

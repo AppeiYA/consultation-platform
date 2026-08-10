@@ -7,6 +7,8 @@ import (
 )
 
 func SetupConfig() *Config {
+	loadDotEnv()
+
 	app := appConfig()
 	return &Config{
 		App:      app,
@@ -14,7 +16,7 @@ func SetupConfig() *Config {
 		Session:  sessionConfig(app.Env),
 		Logger:   loggerConfig(),
 		Database: databaseConfig(),
-		Redis: redisConfig(),
+		Redis:    redisConfig(),
 	}
 }
 
@@ -56,13 +58,13 @@ func loggerConfig() LoggerConfig {
 
 func databaseConfig() DatabaseConfig {
 	return DatabaseConfig{
-		Host: getEnv("DB_HOST", "localhost"),
-		Port: getEnvInt("DB_PORT", 5432),
-		User: getEnv("DB_USER", "peterpaul"),
-		Password: getEnv("DB_PASSWORD", "Appei2004"),
-		Name: getEnv("DB_NAME", "consultation_platform"),
-		SSLMode: getEnv("DB_SSLMODE", "disable"),
-		Schema: getEnv("DB_SCHEMA", "consultation"),
+		Host:               requireEnv("DB_HOST"),
+		Port:               requireEnvInt("DB_PORT"),
+		User:               requireEnv("DB_USER"),
+		Password:           requireEnv("DB_PASSWORD"),
+		Name:               requireEnv("DB_NAME"),
+		SSLMode:            getEnv("DB_SSLMODE", "disable"),
+		Schema:             getEnv("DB_SCHEMA", "consultation"),
 		MaxOpenConnections: getEnvInt("DB_MAX_OPEN_CONNECTIONS", 25),
 		MaxIdleConnections: getEnvInt("DB_MAX_IDLE_CONNECTIONS", 5),
 		MaxLifetimeMinutes: getEnvInt("DB_MAX_LIFETIME_MINUTES", 15),
@@ -71,9 +73,9 @@ func databaseConfig() DatabaseConfig {
 
 func redisConfig() RedisConfig {
 	return RedisConfig{
-		Address: getEnv("REDIS_ADDRESS", "localhost:6379"),
+		Address:  getEnv("REDIS_ADDRESS", "localhost:6379"),
 		Username: getEnv("REDIS_USERNAME", ""),
 		Password: getEnv("REDIS_PASSWORD", ""),
-		DB: getEnvInt("REDIS_DB", 0),
+		DB:       getEnvInt("REDIS_DB", 0),
 	}
 }

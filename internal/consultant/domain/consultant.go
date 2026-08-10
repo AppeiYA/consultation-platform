@@ -2,6 +2,8 @@ package domain
 
 import "time"
 
+const ConsultantIDPrefix = "con"
+
 type Consultant struct {
 	id                string
 	userID            string
@@ -36,6 +38,48 @@ func NewConsultant(
 		createdAt: now,
 		updatedAt: now,
 	}
+}
+
+func ReconstitueConsultant(
+	id string,
+	userID string,
+	profession string,
+	displayName string,
+	bio string,
+	yearsExperience int,
+	isVerified bool,
+	isAcceptingClients bool,
+	createdAt time.Time,
+	updatedAt time.Time,
+) (*Consultant, error) {
+	validProfession, err := NewProfession(profession)
+	if err != nil {
+		return nil, err
+	}
+	validDisplayName, err := NewDisplayName(displayName)
+	if err != nil {
+		return nil, err
+	}
+	validBio, err := NewBio(bio)
+	if err != nil {
+		return nil, err
+	}
+	validYearsExperience, err := NewYearsExperience(yearsExperience)
+	if err != nil {
+		return nil, err
+	}
+	return &Consultant{
+		id: id,
+		userID: userID,
+		profession: validProfession,
+		displayName: validDisplayName,
+		bio: validBio,
+		yearsExperience: validYearsExperience,
+		isVerified: isVerified,
+		isAcceptingClients: isAcceptingClients,
+		createdAt: createdAt,
+		updatedAt: updatedAt,
+	}, nil
 }
 
 func (c *Consultant) ID() string {
