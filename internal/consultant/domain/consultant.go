@@ -121,3 +121,17 @@ func (c *Consultant) CreatedAt() time.Time {
 func (c *Consultant) UpdatedAt() time.Time {
 	return c.updatedAt
 }
+
+func (c *Consultant) UpdateProfile(
+	profession Profession,
+	displayName DisplayName,
+	bio Bio,
+	yearsExperience YearsExperience,
+	now time.Time,
+) {
+	c.profession = profession
+	c.displayName = displayName
+	c.bio = bio
+	c.yearsExperience = yearsExperience
+	c.updatedAt = now
+}

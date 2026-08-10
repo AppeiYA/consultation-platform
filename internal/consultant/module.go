@@ -3,12 +3,14 @@ package consultant
 import (
 	"github.com/AppeiYA/consultation-platform/internal/consultant/ports/inbound"
 	"github.com/AppeiYA/consultation-platform/internal/consultant/ports/outbound"
-		shared_outbound "github.com/AppeiYA/consultation-platform/internal/shared/ports/outbound"
+	shared_outbound "github.com/AppeiYA/consultation-platform/internal/shared/ports/outbound"
 	"github.com/AppeiYA/consultation-platform/internal/consultant/usecase"
 )
 
 type Module struct {
 	RegisterConsultant inbound.RegisterConsultantInt
+	GetConsultant      inbound.GetConsultantInt
+	UpdateConsultant inbound.UpdateConsultantInt
 }
 
 func NewModule(
@@ -20,6 +22,13 @@ func NewModule(
 		RegisterConsultant: usecase.NewRegisterConsultantUsecase(
 			consultantRepo, 
 			idGenerator, 
+			clock,
+		),
+		GetConsultant: usecase.NewGetConsultantUsecase(
+			consultantRepo,
+		),
+		UpdateConsultant: usecase.NewUpdateConsultantUsecase(
+			consultantRepo,
 			clock,
 		),
 	}

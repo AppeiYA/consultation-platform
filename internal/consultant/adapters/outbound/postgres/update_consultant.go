@@ -14,7 +14,7 @@ var updateConsultantQuery = `
 		display_name = :display_name,
 		years_experience = :years_experience,
 		updated_at = :updated_at
-	WHERE user_id = :user_id
+	WHERE id = :id
 `
 
 func (r *ConsultantRepository) Update(

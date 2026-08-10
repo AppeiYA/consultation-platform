@@ -2,25 +2,25 @@ package http
 
 import (
 	"github.com/AppeiYA/consultation-platform/internal/consultant/adapters/inbound/http/dto"
-	shared_http "github.com/AppeiYA/consultation-platform/internal/shared/adapters/http"
 	"github.com/AppeiYA/consultation-platform/internal/shared/logger"
+	shared_http "github.com/AppeiYA/consultation-platform/internal/shared/adapters/http"
 	"github.com/AppeiYA/consultation-platform/internal/shared/response"
 	"github.com/AppeiYA/consultation-platform/internal/shared/session"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
 
-func (h *ConsultantHandler) RegisterConsultant(c *fiber.Ctx) error {
+func(h *ConsultantHandler) UpdateConsultant(c *fiber.Ctx) error {
 	claims := c.Locals(session.ContextClaimsKey).(*session.Claims)
-	var req dto.RegisterConsultantDTO
+	var req dto.UpdateConsultantModel
 	if err := c.BodyParser(&req); err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "Invalid request body", nil)
 	}
 
-	if err := h.ConsultantModule.RegisterConsultant.Execute(c.Context(), claims.UserID, req.ToUsecaseDTO()); err != nil {
-		logger.Error("Error registering consultant at handler.RegisterConsultant", zap.Error(err))
+	if err := h.ConsultantModule.UpdateConsultant.Execute(c.Context(), claims.UserID, req.ToUsecaseDTO()); err != nil {
+		logger.Error("Error updating consultant at handler.UpdateConsultant", zap.Error(err))
 		return response.Error(c, shared_http.StatusFor(err), err.Error(), nil)
 	}
 
-	return response.JSON(c, fiber.StatusCreated, "Consultant profile created. Please verify", nil)
+	return response.JSON(c, fiber.StatusOK, "Consultant profile updated successfully", nil)
 }

@@ -13,20 +13,25 @@ func RegisterConsultantRoutes(
 ) {
 	consultantGroup := router.Group("/consultants")
 
-	// Public
-	// consultantGroup.Get("/:id", consultantHandler.GetConsultant)
-	// consultantGroup.Get("/", consultantHandler.ListConsultants)
-
 	// Protected
 	consultantGroup.Post(
 		"/register",
 		identityMiddleware.Authenticate,
 		consultantHandler.RegisterConsultant,
 	)
+	consultantGroup.Get(
+		"/user",
+		identityMiddleware.Authenticate,
+		consultantHandler.GetConsultantByUserID,
+	)
 
-	// consultantGroup.Put(
-	// 	"/profile",
-	// 	identityMiddleware.Authenticate,
-	// 	consultantHandler.UpdateConsultant,
-	// )
+	// Public
+	consultantGroup.Get("/:id", consultantHandler.GetConsultantByID)
+	// consultantGroup.Get("/", consultantHandler.ListConsultants)
+
+	consultantGroup.Put(
+		"/profile",
+		identityMiddleware.Authenticate,
+		consultantHandler.UpdateConsultant,
+	)
 }

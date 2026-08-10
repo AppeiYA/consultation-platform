@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/AppeiYA/consultation-platform/internal/consultant/domain"
 )
@@ -14,6 +16,9 @@ func (r *ConsultantRepository) FindByUserID(ctx context.Context, userID string) 
 
 	err := executor.GetContext(ctx, &model, findByUserIDQuery, userID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.ErrConsultantNotFound
+		}
 		return nil, err
 	}
 

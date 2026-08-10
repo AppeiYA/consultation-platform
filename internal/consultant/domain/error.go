@@ -4,4 +4,5 @@ import custom_errors "github.com/AppeiYA/consultation-platform/internal/shared/e
 
 var (
 	ErrConsultantAlreadyExists = custom_errors.BadException("consultant already exists")
+	ErrConsultantNotFound      = custom_errors.NotFoundError("consultant not found")
 )
