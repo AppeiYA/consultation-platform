@@ -15,7 +15,6 @@ type PublicConsultantResponseDTO struct {
 	Bio string `json:"bio"`
 
 	YearsExperience int `json:"years_experience"`
-	IsVerified bool `json:"is_verified"`
 	IsAcceptingClients bool `json:"is_accepting_clients"`
 	CreatedAt string `json:"created_at"`
 }
@@ -33,7 +32,6 @@ func (dto *PublicConsultantResponseDTO) FromDomain(consultant *domain.Consultant
 	dto.DisplayName = consultant.DisplayName().String()
 	dto.Bio = consultant.Bio().String()
 	dto.YearsExperience = consultant.YearsExperience().Int()
-	dto.IsVerified = consultant.IsVerified()
 	dto.IsAcceptingClients = consultant.IsAcceptingClients()
 	dto.CreatedAt = consultant.CreatedAt().Format(time.RFC3339)
 }

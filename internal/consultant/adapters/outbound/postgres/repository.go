@@ -11,6 +11,18 @@ type ConsultantRepository struct {
 	clock *system.SystemClock
 }
 
+type VerificationRepository struct {
+	repository db.Repository
+	clock *system.SystemClock
+}
+
+func NewVerificationRepository(repository db.Repository, clock *system.SystemClock) *VerificationRepository {
+	return &VerificationRepository{
+		repository: repository,
+		clock: clock,
+	}
+}
+
 func NewConsultantRepository(repository db.Repository, clock *system.SystemClock) *ConsultantRepository {
 	return &ConsultantRepository{
 		repository: repository,
@@ -19,3 +31,4 @@ func NewConsultantRepository(repository db.Repository, clock *system.SystemClock
 }
 
 var _ outbound.ConsultantRepository = (*ConsultantRepository)(nil)
+var _ outbound.VerificationRepository = (*VerificationRepository)(nil)

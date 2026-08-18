@@ -262,7 +262,7 @@ func TestRegisterConsultant_Integration(t *testing.T) {
 		require.NoError(t, err)
 		defer resp2.Body.Close()
 
-		require.Equal(t, http.StatusBadRequest, resp2.StatusCode)
+		require.Equal(t, http.StatusConflict, resp2.StatusCode)
 
 		errRes := testhelpers.DecodeErrorResponse(t, resp2)
 		require.False(t, errRes.Success)

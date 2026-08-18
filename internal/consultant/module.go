@@ -11,10 +11,13 @@ type Module struct {
 	RegisterConsultant inbound.RegisterConsultantInt
 	GetConsultant      inbound.GetConsultantInt
 	UpdateConsultant inbound.UpdateConsultantInt
+	SubmitVerification inbound.SubmitVerificationInt
 }
 
 func NewModule(
 	consultantRepo outbound.ConsultantRepository,
+	verificationService outbound.VerificationService,
+	verificationRepository outbound.VerificationRepository,
 	idGenerator shared_outbound.IdentifierGenerator,
 	clock shared_outbound.Clock,
 ) *Module {
@@ -30,6 +33,13 @@ func NewModule(
 		UpdateConsultant: usecase.NewUpdateConsultantUsecase(
 			consultantRepo,
 			clock,
+		),
+		SubmitVerification: usecase.NewSubmitVerificationUsecase(
+			consultantRepo,
+			idGenerator,
+			clock,
+			verificationService, 
+			verificationRepository,
 		),
 	}
 }

@@ -96,9 +96,6 @@ func TestRegisterConsultant_Execute(t *testing.T) {
 		if savedConsultant.UserID() != userID {
 			t.Errorf("expected UserID %s, got %s", userID, savedConsultant.UserID())
 		}
-		if savedConsultant.IsVerified() {
-			t.Errorf("expected IsVerified to be false")
-		}
 		if !savedConsultant.IsAcceptingClients() {
 			t.Errorf("expected IsAcceptingClients to be true")
 		}

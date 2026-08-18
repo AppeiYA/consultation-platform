@@ -84,7 +84,6 @@ func TestGetConsultant_Integration(t *testing.T) {
 		require.Equal(t, "Jane Doe Tech", consultantResp.DisplayName)
 		require.Equal(t, "Experienced software engineer with 10 years of experience.", consultantResp.Bio)
 		require.Equal(t, 10, consultantResp.YearsExperience)
-		require.False(t, consultantResp.IsVerified)
 		require.True(t, consultantResp.IsAcceptingClients)
 		require.NotEmpty(t, consultantResp.CreatedAt)
 		require.NotEmpty(t, consultantResp.UpdatedAt)

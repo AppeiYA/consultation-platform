@@ -14,14 +14,13 @@ var saveConsultantQuery = `
 		display_name,
 		bio,
 		years_experience,
-		is_verified,
 		is_accepting_clients,
 		created_at,
 		updated_at
 	)
 	VALUES (
 		$1, $2, $3, $4, $5,
-		$6, $7, $8, $9, $10
+		$6, $7, $8, $9
 	)
 `
 
@@ -38,7 +37,6 @@ func (r *ConsultantRepository) Save(ctx context.Context, consultant *domain.Cons
 		model.DisplayName,
 		model.Bio,
 		model.YearsExperience,
-		model.IsVerified,
 		model.IsAcceptingClients,
 		model.CreatedAt,
 		model.UpdatedAt,

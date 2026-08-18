@@ -34,4 +34,9 @@ func RegisterConsultantRoutes(
 		identityMiddleware.Authenticate,
 		consultantHandler.UpdateConsultant,
 	)
+	consultantGroup.Post(
+		"/verification",
+		identityMiddleware.Authenticate,
+		consultantHandler.SubmitVerification,
+	)
 }

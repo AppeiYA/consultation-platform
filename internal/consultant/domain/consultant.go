@@ -11,7 +11,6 @@ type Consultant struct {
 	displayName       DisplayName
 	bio               Bio
 	yearsExperience   YearsExperience
-	isVerified        bool
 	isAcceptingClients bool
 	createdAt         time.Time
 	updatedAt         time.Time
@@ -33,7 +32,6 @@ func NewConsultant(
 		displayName: displayName,
 		bio: bio,
 		yearsExperience: yearsExperience,
-		isVerified: false,
 		isAcceptingClients: true,
 		createdAt: now,
 		updatedAt: now,
@@ -47,7 +45,6 @@ func ReconstitueConsultant(
 	displayName string,
 	bio string,
 	yearsExperience int,
-	isVerified bool,
 	isAcceptingClients bool,
 	createdAt time.Time,
 	updatedAt time.Time,
@@ -75,7 +72,6 @@ func ReconstitueConsultant(
 		displayName: validDisplayName,
 		bio: validBio,
 		yearsExperience: validYearsExperience,
-		isVerified: isVerified,
 		isAcceptingClients: isAcceptingClients,
 		createdAt: createdAt,
 		updatedAt: updatedAt,
@@ -104,10 +100,6 @@ func (c *Consultant) Bio() Bio {
 
 func (c *Consultant) YearsExperience() YearsExperience {
 	return c.yearsExperience
-}
-
-func (c *Consultant) IsVerified() bool {
-	return c.isVerified
 }
 
 func (c *Consultant) IsAcceptingClients() bool {

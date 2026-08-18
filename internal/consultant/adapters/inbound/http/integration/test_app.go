@@ -7,6 +7,8 @@ import (
 	"github.com/AppeiYA/consultation-platform/internal/consultant"
 	consultant_http "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/inbound/http"
 	consultant_postgres "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres"
+	consultant_verification "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/verification"
+	"github.com/AppeiYA/consultation-platform/internal/consultant/ports/outbound"
 	"github.com/AppeiYA/consultation-platform/internal/identity"
 	identity_http "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http"
 	identity_middleware "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http/middleware"
@@ -27,12 +29,31 @@ type TestHarness struct {
 	App *fiber.App
 }
 
-func setUpConsultantApp(t *testing.T) *TestHarness {
+type ConsultantAppOption func(*consultantAppConfig)
+
+type consultantAppConfig struct {
+	verificationService outbound.VerificationService
+}
+
+func WithVerificationService(service outbound.VerificationService) ConsultantAppOption {
+	return func(c *consultantAppConfig) {
+		c.verificationService = service
+	}
+}
+
+func setUpConsultantApp(t *testing.T, opts ...ConsultantAppOption) *TestHarness {
 	t.Helper()
 	cfg := config.SetupTestConfig()
 
+	appCfg := &consultantAppConfig{
+		verificationService: &consultant_verification.UnavailableVerificationService{},
+	}
+	for _, opt := range opts {
+		opt(appCfg)
+	}
+
 	// Infrastructure using shared testhelpers
-	db := testhelpers.TestPostgres(t, "users", "consultants")
+	db := testhelpers.TestPostgres(t, "users", "consultants", "consultant_verifications")
 	rdb := testhelpers.TestRedis(t)
 
 	// Shared services
@@ -47,6 +68,8 @@ func setUpConsultantApp(t *testing.T) *TestHarness {
 	userRepo := identity_postgres.NewUserRepository(*db, clock)
 	sessionStore := identity_redis.NewSessionStore(rdb, clock)
 	consultantRepo := consultant_postgres.NewConsultantRepository(*db, clock)
+	verificationRepo := consultant_postgres.NewVerificationRepository(*db, clock)
+	verificationService := appCfg.verificationService
 
 	// Modules
 	identityModule := identity.NewModule(
@@ -59,7 +82,13 @@ func setUpConsultantApp(t *testing.T) *TestHarness {
 		sessionTokenGenerator,
 		time.Hour,
 	)
-	consultantModule := consultant.NewModule(consultantRepo, idGenerator, clock)
+	consultantModule := consultant.NewModule(
+		consultantRepo,
+		verificationService,
+		verificationRepo,
+		idGenerator,
+		clock,
+	)
 
 	// Handlers & Middleware
 	identityHandler := identity_http.NewIdentityHandler(identityModule, cookieManager)
