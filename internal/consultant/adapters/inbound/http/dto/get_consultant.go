@@ -1,9 +1,7 @@
 package dto
 
 import (
-	"time"
-
-	"github.com/AppeiYA/consultation-platform/internal/consultant/domain"
+	"github.com/AppeiYA/consultation-platform/internal/consultant/usecase/dto"
 )
 
 type PublicConsultantResponseDTO struct {
@@ -25,18 +23,18 @@ type PrivateConsultantResponseDTO struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-func (dto *PublicConsultantResponseDTO) FromDomain(consultant *domain.Consultant) {
-	dto.ID = consultant.ID()
-	dto.UserID = consultant.UserID()
-	dto.Profession = string(consultant.Profession())
-	dto.DisplayName = consultant.DisplayName().String()
-	dto.Bio = consultant.Bio().String()
-	dto.YearsExperience = consultant.YearsExperience().Int()
-	dto.IsAcceptingClients = consultant.IsAcceptingClients()
-	dto.CreatedAt = consultant.CreatedAt().Format(time.RFC3339)
+func (dto *PublicConsultantResponseDTO) FromUsecaseDTO(consultant *dto.GetConsultantResponseDto) {
+	dto.ID = consultant.ID
+	dto.Profession = consultant.Profession
+	dto.DisplayName = consultant.DisplayName
+	dto.UserID = consultant.UserID
+	dto.Bio = consultant.Bio
+	dto.YearsExperience = consultant.YearsExperience
+	dto.IsAcceptingClients = consultant.IsAcceptingClients
+	dto.CreatedAt = consultant.CreatedAt
 }
 
-func (dto *PrivateConsultantResponseDTO) FromDomain(consultant *domain.Consultant) {
-	dto.PublicConsultantResponseDTO.FromDomain(consultant)
-	dto.UpdatedAt = consultant.UpdatedAt().Format(time.RFC3339)
+func (dto *PrivateConsultantResponseDTO) FromUsecaseDTO(consultant *dto.GetConsultantResponseDto) {
+	dto.PublicConsultantResponseDTO.FromUsecaseDTO(consultant)
+	dto.UpdatedAt = consultant.UpdatedAt
 }

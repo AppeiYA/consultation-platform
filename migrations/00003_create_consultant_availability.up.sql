@@ -1,4 +1,4 @@
-CREATE TABLE consultant_availabilities (
+CREATE TABLE IF NOT EXISTS consultant_availabilities (
     id VARCHAR(64) PRIMARY KEY,
     consultant_id VARCHAR(64) NOT NULL,
     day_of_week SMALLINT NOT NULL,
@@ -21,3 +21,12 @@ CREATE TABLE consultant_availabilities (
     CONSTRAINT uq_consultant_day_time
         UNIQUE (consultant_id, day_of_week, start_time, end_time)
 );
+
+CREATE INDEX IF NOT EXISTS idx_consultant_availabilities_consultant_id
+    ON consultant_availabilities (consultant_id);
+CREATE INDEX IF NOT EXISTS idx_consultant_availabilities_day_of_week
+    ON consultant_availabilities (day_of_week);
+CREATE INDEX IF NOT EXISTS idx_consultant_availabilities_start_time
+    ON consultant_availabilities (start_time);
+CREATE INDEX IF NOT EXISTS idx_consultant_availabilities_end_time
+    ON consultant_availabilities (end_time);

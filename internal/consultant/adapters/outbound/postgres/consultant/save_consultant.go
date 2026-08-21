@@ -1,4 +1,4 @@
-package postgres
+package consultantRepo
 
 import (
 	"context"
@@ -10,7 +10,7 @@ var saveConsultantQuery = `
 	INSERT INTO consultants (
 		id,
 		user_id,
-		profession,
+		profession_id,
 		display_name,
 		bio,
 		years_experience,
@@ -33,7 +33,7 @@ func (r *ConsultantRepository) Save(ctx context.Context, consultant *domain.Cons
 		saveConsultantQuery,
 		model.ID,
 		model.UserID,
-		model.Profession,
+		model.ProfessionID,
 		model.DisplayName,
 		model.Bio,
 		model.YearsExperience,

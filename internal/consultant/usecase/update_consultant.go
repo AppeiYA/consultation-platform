@@ -11,15 +11,18 @@ import (
 
 type UpdateConsultant struct {
 	consultantRepo outbound.ConsultantRepository
+	professionRepo outbound.ProfessionRepository
 	clock          shared_outbound.Clock
 }
 
 func NewUpdateConsultantUsecase(
 	consultantRepo outbound.ConsultantRepository,
+	professionRepo outbound.ProfessionRepository,
 	clock shared_outbound.Clock,
 ) *UpdateConsultant {
 	return &UpdateConsultant{
 		consultantRepo: consultantRepo,
+		professionRepo: professionRepo,
 		clock:          clock,
 	}
 }
@@ -30,9 +33,16 @@ func (uc *UpdateConsultant) Execute(ctx context.Context, userID string, input dt
 		return err
 	}
 
-	newProfession, err := domain.NewProfession(input.Profession)
+	if input.ProfessionID == "" {
+		return domain.ErrInvalidProfession
+	}
+
+	profession, err := uc.professionRepo.GetProfessionByID(ctx, input.ProfessionID)
 	if err != nil {
 		return err
+	}
+	if profession == nil {
+		return domain.ErrInvalidProfession
 	}
 	newDisplayName, err := domain.NewDisplayName(input.DisplayName)
 	if err != nil {
@@ -47,7 +57,7 @@ func (uc *UpdateConsultant) Execute(ctx context.Context, userID string, input dt
 		return err
 	}
 
-	consultant.UpdateProfile(newProfession, newDisplayName, newBio, newYearsExperience, uc.clock.Now())
+	consultant.UpdateProfile(*profession, newDisplayName, newBio, newYearsExperience, uc.clock.Now())
 
 	return uc.consultantRepo.Update(ctx, consultant)
 }

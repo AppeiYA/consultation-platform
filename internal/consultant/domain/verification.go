@@ -4,7 +4,6 @@ import "time"
 
 var (
 	VerificationIDPrefix = "ver"
-	VerifcationIDPrefix  = VerificationIDPrefix
 )
 
 type ConsultantVerification struct {

@@ -1,4 +1,4 @@
-package postgres
+package consultantVerificationRepo
 
 import (
 	"github.com/AppeiYA/consultation-platform/internal/consultant/ports/outbound"
@@ -6,10 +6,6 @@ import (
 	"github.com/AppeiYA/consultation-platform/internal/shared/db"
 )
 
-type ConsultantRepository struct {
-	repository db.Repository
-	clock *system.SystemClock
-}
 
 type VerificationRepository struct {
 	repository db.Repository
@@ -23,12 +19,4 @@ func NewVerificationRepository(repository db.Repository, clock *system.SystemClo
 	}
 }
 
-func NewConsultantRepository(repository db.Repository, clock *system.SystemClock) *ConsultantRepository {
-	return &ConsultantRepository{
-		repository: repository,
-		clock: clock,
-	}
-}
-
-var _ outbound.ConsultantRepository = (*ConsultantRepository)(nil)
 var _ outbound.VerificationRepository = (*VerificationRepository)(nil)

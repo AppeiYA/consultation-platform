@@ -10,28 +10,36 @@ import (
 type Module struct {
 	RegisterConsultant inbound.RegisterConsultantInt
 	GetConsultant      inbound.GetConsultantInt
-	UpdateConsultant inbound.UpdateConsultantInt
+	UpdateConsultant   inbound.UpdateConsultantInt
 	SubmitVerification inbound.SubmitVerificationInt
+	CreateAvailability inbound.CreateAvailabilityInt
+	GetProfession      inbound.GetProfessionInt
+	ListProfessions     inbound.ListProfessionsInt
 }
 
 func NewModule(
 	consultantRepo outbound.ConsultantRepository,
 	verificationService outbound.VerificationService,
 	verificationRepository outbound.VerificationRepository,
+	availabilityRepository outbound.AvailabilityRepository,
+	professionRepo outbound.ProfessionRepository,
 	idGenerator shared_outbound.IdentifierGenerator,
 	clock shared_outbound.Clock,
 ) *Module {
 	return &Module{
 		RegisterConsultant: usecase.NewRegisterConsultantUsecase(
 			consultantRepo, 
+			professionRepo,
 			idGenerator, 
 			clock,
 		),
 		GetConsultant: usecase.NewGetConsultantUsecase(
 			consultantRepo,
+			professionRepo,
 		),
 		UpdateConsultant: usecase.NewUpdateConsultantUsecase(
 			consultantRepo,
+			professionRepo,
 			clock,
 		),
 		SubmitVerification: usecase.NewSubmitVerificationUsecase(
@@ -40,6 +48,18 @@ func NewModule(
 			clock,
 			verificationService, 
 			verificationRepository,
+		),
+		CreateAvailability: usecase.NewCreateAvailabilityUsecase(
+			availabilityRepository,
+			idGenerator,
+			consultantRepo,
+			clock,
+		),
+		GetProfession: usecase.NewGetProfessionUsecase(
+			professionRepo,
+		),
+		ListProfessions: usecase.NewListProfessionsUsecase(
+			professionRepo,
 		),
 	}
 }

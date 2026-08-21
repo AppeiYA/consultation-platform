@@ -12,14 +12,14 @@ import (
 
 func TestUpdateConsultant_Integration(t *testing.T) {
 	initialConsultantReq := consultant_dto.RegisterConsultantDTO{
-		Profession:      "SOFTWARE_ENGINEER",
+		ProfessionID:    "prof_9ee432d7-b672-40ae-b03f-c1f1fb696621",
 		DisplayName:     "Jane Doe Tech",
 		Bio:             "Experienced software engineer with 10 years of experience.",
 		YearsExperience: 10,
 	}
 
 	validUpdateReq := consultant_dto.UpdateConsultantModel{
-		Profession:      "LAWYER",
+		ProfessionID:    "prof_12d965f5-e1f5-49aa-ac57-856772d236ce",
 		DisplayName:     "Jane Doe Legal",
 		Bio:             "Senior corporate lawyer with over 12 years of trial experience.",
 		YearsExperience: 12,
@@ -185,7 +185,7 @@ func TestUpdateConsultant_Integration(t *testing.T) {
 		require.Equal(t, http.StatusCreated, regResp.StatusCode)
 
 		invalidReq := validUpdateReq
-		invalidReq.Profession = "INVALID_PROFESSION"
+		invalidReq.ProfessionID = "INVALID_PROFESSION"
 
 		resp, err := testhelpers.PerformRequestWithCookie(
 			harness.App,

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	custom_errors "github.com/AppeiYA/consultation-platform/internal/shared/errors"
-	shared_outbound "github.com/AppeiYA/consultation-platform/internal/shared/ports/outbound"
 )
 
 var ConsultantAvailabilityIDPrefix = "conav"
@@ -30,13 +29,12 @@ func NewConsultantAvailability(
 	consultantID string, 
 	dayOfWeek time.Weekday, 
 	startTime TimeOfDay, 
-	endTime TimeOfDay, 
-	clock shared_outbound.Clock,
+	endTime TimeOfDay,
+	now time.Time,
 ) (*ConsultantAvailability, error) {
 	if !startTime.Before(endTime) {
 		return nil, ErrInvalidTimeRange
 	}
-	now := clock.Now()
 	return &ConsultantAvailability{
 		id: id,
 		consultantID: consultantID,
@@ -46,6 +44,31 @@ func NewConsultantAvailability(
 		isActive: true,
 		createdAt: now,
 		updatedAt: now,
+	}, nil
+}
+
+func ReconstitueConsultantAvailability(
+	id string,
+	consultantID string,
+	dayOfWeek time.Weekday,
+	startTime TimeOfDay,
+	endTime TimeOfDay,
+	isActive bool,
+	createdAt time.Time,
+	updatedAt time.Time,
+) (*ConsultantAvailability, error) {
+	if !startTime.Before(endTime) {
+		return nil, ErrInvalidTimeRange
+	}
+	return &ConsultantAvailability{
+		id: id,
+		consultantID: consultantID,
+		dayOfWeek: dayOfWeek,
+		startTime: startTime,
+		endTime: endTime,
+		isActive: isActive,
+		createdAt: createdAt,
+		updatedAt: updatedAt,
 	}, nil
 }
 
@@ -81,14 +104,14 @@ func (ca *ConsultantAvailability) UpdatedAt() time.Time {
 	return ca.updatedAt
 }
 
-func (a *ConsultantAvailability) Activate(clock shared_outbound.Clock) {
+func (a *ConsultantAvailability) Activate(now time.Time) {
 	a.isActive = true
-	a.updatedAt = clock.Now()
+	a.updatedAt = now
 }
 
-func (a *ConsultantAvailability) Deactivate(clock shared_outbound.Clock) {
+func (a *ConsultantAvailability) Deactivate(now time.Time) {
 	a.isActive = false
-	a.updatedAt = clock.Now()
+	a.updatedAt = now
 }
 
 func (a *ConsultantAvailability) Overlaps(

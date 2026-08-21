@@ -34,20 +34,24 @@ func httpConfig() HttpConfig {
 	}
 }
 
-func sessionConfig(app_env string) SessionConfig {
-	var secure, httpOnly bool
-	if app_env == "production" {
-		secure, httpOnly = true, true
-	} else {
-		secure, httpOnly = false, true
-	}
-	return SessionConfig{
-		CookieName: getEnv("SESSION_COOKIE_NAME", "session_id"),
-		TTL:        getEnvDuration("SESSION_TTL", 24*time.Hour),
-		Secure:     secure,
-		HTTPOnly:   httpOnly,
-		SameSite:   fiber.CookieSameSiteLaxMode,
-	}
+func sessionConfig(appEnv string) SessionConfig {
+    if appEnv == "production" {
+        return SessionConfig{
+            CookieName: getEnv("SESSION_COOKIE_NAME", "session_id"),
+            TTL:        getEnvDuration("SESSION_TTL", 24*time.Hour),
+            Secure:     true,
+            HTTPOnly:   true,
+            SameSite:   string(fiber.CookieSameSiteLaxMode),
+        }
+    }
+
+    return SessionConfig{
+        CookieName: getEnv("SESSION_COOKIE_NAME", "session_id"),
+        TTL:        getEnvDuration("SESSION_TTL", 24*time.Hour),
+        Secure:     false,
+        HTTPOnly:   true,
+        SameSite:   string(fiber.CookieSameSiteLaxMode),
+    }
 }
 
 func loggerConfig() LoggerConfig {

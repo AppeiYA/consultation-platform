@@ -7,7 +7,7 @@ const ConsultantIDPrefix = "con"
 type Consultant struct {
 	id                string
 	userID            string
-	profession        Profession
+	professionID        string
 	displayName       DisplayName
 	bio               Bio
 	yearsExperience   YearsExperience
@@ -19,7 +19,7 @@ type Consultant struct {
 func NewConsultant(
 	id string,
 	userID string,
-	profession Profession,
+	professionID string,
 	displayName DisplayName,
 	bio Bio,
 	yearsExperience YearsExperience,
@@ -28,7 +28,7 @@ func NewConsultant(
 	return &Consultant{
 		id: id,
 		userID: userID,
-		profession: profession,
+		professionID: professionID,
 		displayName: displayName,
 		bio: bio,
 		yearsExperience: yearsExperience,
@@ -41,7 +41,7 @@ func NewConsultant(
 func ReconstitueConsultant(
 	id string,
 	userID string,
-	profession string,
+	professionID string,
 	displayName string,
 	bio string,
 	yearsExperience int,
@@ -49,10 +49,6 @@ func ReconstitueConsultant(
 	createdAt time.Time,
 	updatedAt time.Time,
 ) (*Consultant, error) {
-	validProfession, err := NewProfession(profession)
-	if err != nil {
-		return nil, err
-	}
 	validDisplayName, err := NewDisplayName(displayName)
 	if err != nil {
 		return nil, err
@@ -68,7 +64,7 @@ func ReconstitueConsultant(
 	return &Consultant{
 		id: id,
 		userID: userID,
-		profession: validProfession,
+		professionID: professionID,
 		displayName: validDisplayName,
 		bio: validBio,
 		yearsExperience: validYearsExperience,
@@ -86,8 +82,8 @@ func (c *Consultant) UserID() string {
 	return c.userID
 }
 
-func (c *Consultant) Profession() Profession {
-	return c.profession
+func (c *Consultant) ProfessionID() string {
+	return c.professionID
 }
 
 func (c *Consultant) DisplayName() DisplayName {
@@ -121,7 +117,7 @@ func (c *Consultant) UpdateProfile(
 	yearsExperience YearsExperience,
 	now time.Time,
 ) {
-	c.profession = profession
+	c.professionID = profession.ID()
 	c.displayName = displayName
 	c.bio = bio
 	c.yearsExperience = yearsExperience

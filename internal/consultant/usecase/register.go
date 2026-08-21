@@ -11,13 +11,20 @@ import (
 
 type RegisterConsultant struct {
 	consultantRepo outbound.ConsultantRepository
+	professionRepo outbound.ProfessionRepository
 	idGenerator shared_outbound.IdentifierGenerator
 	clock shared_outbound.Clock
 }
 
-func NewRegisterConsultantUsecase(consultantRepo outbound.ConsultantRepository, idGenerator shared_outbound.IdentifierGenerator, clock shared_outbound.Clock) *RegisterConsultant {
+func NewRegisterConsultantUsecase(
+	consultantRepo outbound.ConsultantRepository, 
+	professionRepo outbound.ProfessionRepository, 
+	idGenerator shared_outbound.IdentifierGenerator, 
+	clock shared_outbound.Clock,
+	) *RegisterConsultant {
 	return &RegisterConsultant{
 		consultantRepo: consultantRepo,
+		professionRepo: professionRepo,
 		idGenerator: idGenerator,
 		clock: clock,
 	}
@@ -33,17 +40,23 @@ func (uc *RegisterConsultant) Execute(ctx context.Context, userID string, req *d
 		return domain.ErrConsultantAlreadyExists
 	}
 
-	// genarate a new ID for consultant
+	if req.ProfessionID == "" {
+		return domain.ErrInvalidProfession
+	}
 
-	newID, err := uc.idGenerator.Generate(domain.ConsultantIDPrefix)
+	// check if profession exists 
+	profession, err := uc.professionRepo.GetProfessionByID(ctx, req.ProfessionID)
 	if err != nil {
 		return err
 	}
+	if profession == nil {
+		return domain.ErrInvalidProfession
+	}
 
-	// check profession is valid
-	profession, err := domain.NewProfession(req.Profession)
+	// genarate a new ID for consultant
+	newID, err := uc.idGenerator.Generate(domain.ConsultantIDPrefix)
 	if err != nil {
-		return err 
+		return err
 	}
 
 	// check correct display name 
@@ -67,7 +80,7 @@ func (uc *RegisterConsultant) Execute(ctx context.Context, userID string, req *d
 	consultant := domain.NewConsultant(
 		newID,
 		userID,
-		profession,
+		profession.ID(),
 		displayName,
 		bio,
 		yearsExperience,

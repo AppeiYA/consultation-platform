@@ -2,6 +2,7 @@ package outbound
 
 import (
 	"context"
+	"time"
 
 	"github.com/AppeiYA/consultation-platform/internal/consultant/domain"
 )
@@ -20,6 +21,12 @@ type AvailabilityRepository interface {
 	FindAvailabilitiesByConsultantID(
 		ctx context.Context,
 		consultantID string,
+	) ([]*domain.ConsultantAvailability, error)
+
+	FindAvailabilitiesByConsultantIDAndDayOfWeek(
+		ctx context.Context,
+		consultantID string,
+		dayOfWeek time.Weekday,
 	) ([]*domain.ConsultantAvailability, error)
 
 	UpdateAvailability(

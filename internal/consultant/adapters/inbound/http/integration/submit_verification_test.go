@@ -15,7 +15,7 @@ import (
 
 func TestSubmitVerification_Integration(t *testing.T) {
 	validConsultantReq := consultant_dto.RegisterConsultantDTO{
-		Profession:      "SOFTWARE_ENGINEER",
+		ProfessionID:    "prof_9ee432d7-b672-40ae-b03f-c1f1fb696621",
 		DisplayName:     "Jane Doe Tech",
 		Bio:             "Experienced software engineer with 10 years of experience.",
 		YearsExperience: 10,

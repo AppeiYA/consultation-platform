@@ -20,7 +20,7 @@ func (h *ConsultantHandler) GetConsultantByID(c *fiber.Ctx) error {
 		return response.Error(c, shared_http.StatusFor(err), err.Error(), nil)
 	}
 
-	getConsultantResp.FromDomain(consultant)
+	getConsultantResp.FromUsecaseDTO(consultant)
 
 	return response.JSON(c, fiber.StatusOK, "Consultant fetched successfully", getConsultantResp)
 }
@@ -35,7 +35,7 @@ func (h *ConsultantHandler) GetConsultantByUserID(c *fiber.Ctx) error {
 		return response.Error(c, shared_http.StatusFor(err), err.Error(), nil)
 	}
 
-	getConsultantResp.FromDomain(consultant)
+	getConsultantResp.FromUsecaseDTO(consultant)
 
 	return response.JSON(c, fiber.StatusOK, "Consultant fetched successfully", getConsultantResp)
 }

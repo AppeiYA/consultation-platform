@@ -3,7 +3,11 @@ package app
 import (
 	"github.com/AppeiYA/consultation-platform/internal/consultant"
 	consultant_http "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/inbound/http"
-	consultant_postgres "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres"
+
+	consultantRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant"
+	consultantAvailabilityRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant_availability"
+	consultantVerificationRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant_verification"
+	professionRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/profession"
 	"github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/verification"
 	"github.com/AppeiYA/consultation-platform/internal/shared/adapters/id/uuid"
 	system "github.com/AppeiYA/consultation-platform/internal/shared/adapters/outbound/clock"
@@ -17,13 +21,17 @@ func (a *App) registerConsultantModule(
 ) {
 	verificationService := verification.UnavailableVerificationService{}
 
-	consultantRepo := consultant_postgres.NewConsultantRepository(db, clock)
-	verificationRepo := consultant_postgres.NewVerificationRepository(db, clock)
+	consultantRepo := consultantRepo.NewConsultantRepository(db, clock)
+	verificationRepo := consultantVerificationRepo.NewVerificationRepository(db, clock)
+	availabilityRepo := consultantAvailabilityRepo.NewAvailabilityRepository(db, clock)
+	professionRepo := professionRepo.NewProfessionRepository(db, clock)
 
 	consultantModule := consultant.NewModule(
 		consultantRepo,
 		&verificationService,
 		verificationRepo,
+		availabilityRepo,
+		professionRepo,
 		idGenerator,
 		clock,
 	)

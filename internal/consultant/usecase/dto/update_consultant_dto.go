@@ -1,7 +1,7 @@
 package dto
 
 type UpdateConsultantDTO struct {
-	Profession        string
+	ProfessionID        string
 	DisplayName       string
 	Bio               string
 	YearsExperience   int

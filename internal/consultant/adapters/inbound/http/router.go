@@ -24,8 +24,19 @@ func RegisterConsultantRoutes(
 		identityMiddleware.Authenticate,
 		consultantHandler.GetConsultantByUserID,
 	)
+	consultantGroup.Post(
+		"/availability",
+		identityMiddleware.Authenticate,
+		consultantHandler.CreateAvailability,
+	)
+	consultantGroup.Post(
+		"/verification",
+		identityMiddleware.Authenticate,
+		consultantHandler.SubmitVerification,
+	)
 
 	// Public
+	consultantGroup.Get("/professions", consultantHandler.ListProfessions)
 	consultantGroup.Get("/:id", consultantHandler.GetConsultantByID)
 	// consultantGroup.Get("/", consultantHandler.ListConsultants)
 
@@ -33,10 +44,5 @@ func RegisterConsultantRoutes(
 		"/profile",
 		identityMiddleware.Authenticate,
 		consultantHandler.UpdateConsultant,
-	)
-	consultantGroup.Post(
-		"/verification",
-		identityMiddleware.Authenticate,
-		consultantHandler.SubmitVerification,
 	)
 }

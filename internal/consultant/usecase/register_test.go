@@ -14,6 +14,7 @@ import (
 
 type testRegisterConsultant struct {
 	consultantRepo *mocks.MockConsultantRepository
+	professionRepo *mocks.MockProfessionRepository
 	idGenerator    *shared_mocks.MockIDGenerator
 	clock          *shared_mocks.MockClock
 
@@ -41,11 +42,18 @@ func setUpRegisterConsultant(t *testing.T) *testRegisterConsultant {
 			return time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
 		},
 	}
+	professionRepo := &mocks.MockProfessionRepository{
+		GetProfessionByIDFn: func(ctx context.Context, professionID string) (*domain.Profession, error) {
+			prof := domain.NewProfession("prof_001", "SOFTWARE_ENGINEER", time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC))
+			return &prof, nil
+		},
+	}
 
-	sut := NewRegisterConsultantUsecase(consultantRepo, idGenerator, clock)
+	sut := NewRegisterConsultantUsecase(consultantRepo, professionRepo, idGenerator, clock)
 
 	return &testRegisterConsultant{
 		consultantRepo: consultantRepo,
+		professionRepo: professionRepo,
 		idGenerator:    idGenerator,
 		clock:          clock,
 		sut:            sut,
@@ -56,7 +64,7 @@ func TestRegisterConsultant_Execute(t *testing.T) {
 	now := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
 	userID := "user_123"
 	validReq := &dto.RegisterConsultantDTO{
-		Profession:      "SOFTWARE_ENGINEER",
+		ProfessionID:    "prof_001",
 		DisplayName:     "John Doe",
 		Bio:             "Experienced software engineer with 5 years in tech.",
 		YearsExperience: 5,
@@ -157,7 +165,7 @@ func TestRegisterConsultant_Execute(t *testing.T) {
 	t.Run("should fail when profession is invalid", func(t *testing.T) {
 		tc := setUpRegisterConsultant(t)
 		req := *validReq
-		req.Profession = "INVALID_PROFESSION"
+		req.ProfessionID = ""
 
 		err := tc.sut.Execute(context.Background(), userID, &req)
 		if err == nil {
@@ -165,6 +173,22 @@ func TestRegisterConsultant_Execute(t *testing.T) {
 		}
 		if !errors.Is(err, domain.ErrInvalidProfession) {
 			t.Errorf("expected ErrInvalidProfession, got %v", err)
+		}
+	})
+
+	t.Run("should fail when profession does not exist", func(t *testing.T) {
+		tc := setUpRegisterConsultant(t)
+		expectedErr := domain.ErrInvalidProfession
+		tc.professionRepo.GetProfessionByIDFn = func(ctx context.Context, professionID string) (*domain.Profession, error) {
+			return nil, expectedErr
+		}
+
+		err := tc.sut.Execute(context.Background(), userID, validReq)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !errors.Is(err, expectedErr) {
+			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
 	})
 

@@ -54,16 +54,15 @@ func (uc *CreateAvailabilityUsecase) Execute(ctx context.Context, userID string,
 	}
 
 	// get consultant availability by day of week
-	availabilities, err := uc.availabilityRepository.FindAvailabilitiesByConsultantID(ctx, consultant.ID())
+	availabilities, err := uc.availabilityRepository.FindAvailabilitiesByConsultantIDAndDayOfWeek(ctx, consultant.ID(), time.Weekday(req.DayOfWeek))
 	if err != nil {
 		return err
 	}
 
+	// check for overlapping availability
 	for _, availability := range availabilities {
-		if availability.DayOfWeek() == time.Weekday(req.DayOfWeek) {
-			if availability.Overlaps(startTime, endTime) {
-				return domain.ErrAvailabilityOverlap
-			}
+		if availability.Overlaps(startTime, endTime) {
+			return domain.ErrAvailabilityOverlap
 		}
 	}
 
@@ -80,7 +79,7 @@ func (uc *CreateAvailabilityUsecase) Execute(ctx context.Context, userID string,
 		time.Weekday(req.DayOfWeek),
 		startTime,
 		endTime,
-		uc.clock,
+		uc.clock.Now(),
 	)
 	if err != nil {
 		return err

@@ -1,8 +1,10 @@
 package domain
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	custom_errors "github.com/AppeiYA/consultation-platform/internal/shared/errors"
 )
@@ -50,6 +52,12 @@ func NewTimeOfDayFromString(timeStr string) (TimeOfDay, error) {
 
 	return NewTimeOfDay(hour, minute)
 }
+func NewTimeOfDayFromTime(t time.Time) TimeOfDay {
+	return TimeOfDay{
+		hour:   t.Hour(),
+		minute: t.Minute(),
+	}
+}
 
 func (t TimeOfDay) MinutesSinceMidnight() int {
 	return t.hour*60 + t.minute
@@ -73,4 +81,14 @@ func (t TimeOfDay) Hour() int {
 
 func (t TimeOfDay) Minute() int {
 	return t.minute
+}
+
+func (t TimeOfDay) Time(dayOfWeek time.Weekday) time.Time {
+	now := time.Now()
+
+	return time.Date(now.Year(), now.Month(), int(dayOfWeek), t.hour, t.minute, 0, 0, time.UTC)
+}
+
+func (t TimeOfDay) String() string {
+	return fmt.Sprintf("%02d:%02d", t.hour, t.minute)
 }

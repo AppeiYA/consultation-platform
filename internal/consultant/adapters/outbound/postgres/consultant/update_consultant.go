@@ -1,4 +1,4 @@
-package postgres
+package consultantRepo
 
 import (
 	"context"
@@ -10,7 +10,7 @@ var updateConsultantQuery = `
 	UPDATE consultants
 	SET 
 		bio = :bio, 
-		profession = :profession, 
+		profession_id = :profession_id, 
 		display_name = :display_name,
 		years_experience = :years_experience,
 		updated_at = :updated_at
