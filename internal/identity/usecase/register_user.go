@@ -41,7 +41,7 @@ func (r *RegisterUser) Execute(ctx context.Context, params dto.RegisterUserReque
 		return nil, err
 	}
 
-	role, err := domain.NewRole(params.Role)
+	role, err := domain.NewRole("CLIENT")
 	if err != nil {
 		return nil, err
 	}

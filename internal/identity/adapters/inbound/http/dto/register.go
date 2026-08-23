@@ -7,7 +7,6 @@ type RegisterRequest struct {
 	LastName  string `json:"last_name" validate:"required,min=3,max=50"`
 	Email     string `json:"email" validate:"required,email"`
 	Password  string `json:"password" validate:"required,min=8,max=50"`
-	Role      string `json:"role" validate:"required,oneof=CLIENT EXPERT"`
 }
 
 type RegisterUserResponse struct {
@@ -26,6 +25,5 @@ func (r RegisterRequest) ToRegisterParams() *usecase_dto.RegisterUserRequest {
 		LastName:  r.LastName,
 		Email:     r.Email,
 		Password:  r.Password,
-		Role:      r.Role,
 	}
 }

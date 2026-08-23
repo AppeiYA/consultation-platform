@@ -24,6 +24,7 @@ func NewModule(
 	verificationRepository outbound.VerificationRepository,
 	availabilityRepository outbound.AvailabilityRepository,
 	professionRepo outbound.ProfessionRepository,
+	identityAdapter outbound.RoleAssigner,
 	idGenerator shared_outbound.IdentifierGenerator,
 	clock shared_outbound.Clock,
 ) *Module {
@@ -31,6 +32,7 @@ func NewModule(
 		RegisterConsultant: usecase.NewRegisterConsultantUsecase(
 			consultantRepo, 
 			professionRepo,
+			identityAdapter,
 			idGenerator, 
 			clock,
 		),

@@ -4,6 +4,7 @@ import (
 	"github.com/AppeiYA/consultation-platform/internal/consultant"
 	consultant_http "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/inbound/http"
 
+	consultantIdentityAdapter "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/external/identity"
 	consultantRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant"
 	consultantAvailabilityRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant_availability"
 	consultantVerificationRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant_verification"
@@ -18,6 +19,7 @@ func (a *App) registerConsultantModule(
 	db db.Repository,
 	clock *system.SystemClock,
 	idGenerator *uuid.Generator,
+	roleAssigner *consultantIdentityAdapter.RoleAssigner,
 ) {
 	verificationService := verification.UnavailableVerificationService{}
 
@@ -32,6 +34,7 @@ func (a *App) registerConsultantModule(
 		verificationRepo,
 		availabilityRepo,
 		professionRepo,
+		roleAssigner,
 		idGenerator,
 		clock,
 	)

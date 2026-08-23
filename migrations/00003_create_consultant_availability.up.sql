@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS consultant_availabilities (
 
     CONSTRAINT fk_availability_consultant
         FOREIGN KEY (consultant_id)
-        REFERENCES consultants(id),
+        REFERENCES consultants(id) ON DELETE CASCADE,
 
     CONSTRAINT chk_availability_day
         CHECK (day_of_week BETWEEN 0 AND 6),

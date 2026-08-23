@@ -17,7 +17,6 @@ func TestRegisterUser_Integration(t *testing.T) {
 			LastName:  "Doe",
 			Email:     "jane.doe@example.com",
 			Password:  "SecurePassword123!",
-			Role:      "CLIENT",
 		}
 
 		resp, err := performRequest(
@@ -46,7 +45,6 @@ func TestRegisterUser_Integration(t *testing.T) {
 			LastName:  "Doe",
 			Email:     "invalid-email",
 			Password:  "SecurePassword123!",
-			Role:      "CLIENT",
 		}
 
 		resp, err := performRequest(
@@ -75,7 +73,6 @@ func TestRegisterUser_Integration(t *testing.T) {
 			LastName:  "Doe",
 			Email:     "jane.doe@example.com",
 			Password:  "weak",
-			Role:      "CLIENT",
 		}
 
 		resp, err := performRequest(
@@ -104,7 +101,6 @@ func TestRegisterUser_Integration(t *testing.T) {
 			LastName:  "Doe",
 			Email:     "jane.doe@example.com",
 			Password:  "SecurePassword123!",
-			Role:      "CLIENT",
 		}
 
 		// First registration - should succeed
@@ -135,35 +131,4 @@ func TestRegisterUser_Integration(t *testing.T) {
 		require.False(t, res.Success)
 		require.Equal(t, "user already exists", res.Message)
 	})
-
-	t.Run("should reject invalid role", func(t *testing.T) {
-		harness := setUpIdentityApp(t)
-
-		reqBody := dto.RegisterRequest{
-			FirstName: "Jane",
-			LastName:  "Doe",
-			Email:     "jane.doe@example.com",
-			Password:  "SecurePassword123!",
-			Role:      "INVALID_ROLE",
-		}
-
-		resp, err := performRequest(
-			harness.App,
-			http.MethodPost,
-			"/test/v1/identity/register",
-			reqBody,
-		)
-
-		require.NoError(t, err)
-		defer resp.Body.Close()
-
-		require.Equal(t, http.StatusBadRequest, resp.StatusCode)
-
-		res := decodeResponse(t, resp)
-
-		require.False(t, res.Success)
-		require.Equal(t, "invalid role", res.Message)
-	})
 }
-
-

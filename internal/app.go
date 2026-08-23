@@ -12,6 +12,7 @@ import (
 
 	"github.com/AppeiYA/consultation-platform/internal/consultant"
 	consultant_http "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/inbound/http"
+	consultantIdentityAdapter "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/external/identity"
 	"github.com/AppeiYA/consultation-platform/internal/identity"
 	identity_http "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http"
 	identity_auth_middleware "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http/middleware"
@@ -35,6 +36,7 @@ type App struct {
 	identityHandler *identity_http.IdentityHandler
 	identityAuthMiddleware *identity_auth_middleware.AuthenticationMiddleware
 
+	consultantIdentityAdapter *consultantIdentityAdapter.RoleAssigner
 	consultantModule *consultant.Module
 	consultantHandler *consultant_http.ConsultantHandler
 }
@@ -100,10 +102,12 @@ func New() (*App, error) {
 	)
 
 	// consultant
+	roleAssigner := consultantIdentityAdapter.NewRoleAssigner(a.identityModule)
 	a.registerConsultantModule(
 		repository,
 		clock,
 		idGenerator,
+		roleAssigner,
 	)
 
 	SetUpRouter(a)

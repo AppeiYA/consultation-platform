@@ -56,7 +56,6 @@ func TestRegisterUser_Execute(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "john.doe@example.com",
 		Password:  "SecurePass123!",
-		Role:      "CLIENT",
 	}
 
 	t.Run("should register user successfully", func(t *testing.T) {
@@ -90,6 +89,9 @@ func TestRegisterUser_Execute(t *testing.T) {
 		if savedUser.Email().String() != validParams.Email {
 			t.Errorf("expected saved email %s, got %s", validParams.Email, savedUser.Email().String())
 		}
+		if savedUser.Role().String() != "CLIENT" {
+			t.Errorf("expected saved user role CLIENT, got %s", savedUser.Role().String())
+		}
 	})
 
 	t.Run("should fail when email is invalid", func(t *testing.T) {
@@ -118,22 +120,6 @@ func TestRegisterUser_Execute(t *testing.T) {
 		resp, err := uc.Execute(context.Background(), params)
 		if err == nil {
 			t.Error("expected error for invalid password, got nil")
-		}
-		if resp != nil {
-			t.Errorf("expected nil response, got %v", resp)
-		}
-	})
-
-	t.Run("should fail when role is invalid", func(t *testing.T) {
-		deps := setupRegisterUser(t)
-		uc := NewRegisterUser(deps.userRepo, deps.passwordHasher, deps.idGenerator, deps.clock)
-
-		params := validParams
-		params.Role = "INVALID_ROLE"
-
-		resp, err := uc.Execute(context.Background(), params)
-		if err == nil {
-			t.Error("expected error for invalid role, got nil")
 		}
 		if resp != nil {
 			t.Errorf("expected nil response, got %v", resp)

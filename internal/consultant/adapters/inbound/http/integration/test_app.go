@@ -7,6 +7,7 @@ import (
 
 	"github.com/AppeiYA/consultation-platform/internal/consultant"
 	consultant_http "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/inbound/http"
+	consultantIdentityAdapter "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/external/identity"
 	consultantRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant"
 	consultantAvailabilityRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant_availability"
 	consultantVerificationRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant_verification"
@@ -110,12 +111,14 @@ func setUpConsultantApp(t *testing.T, opts ...ConsultantAppOption) *TestHarness 
 		sessionTokenGenerator,
 		time.Hour,
 	)
+	roleAssigner := consultantIdentityAdapter.NewRoleAssigner(identityModule)
 	consultantModule := consultant.NewModule(
 		consultantRepository,
 		verificationService,
 		verificationRepo,
 		availabilityRepo,
 		professionRepository,
+		roleAssigner,
 		idGenerator,
 		clock,
 	)

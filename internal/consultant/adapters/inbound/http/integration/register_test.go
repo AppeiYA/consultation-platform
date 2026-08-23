@@ -19,7 +19,6 @@ func registerAndLoginUser(t *testing.T, harness *TestHarness, email string) stri
 		LastName:  "Doe",
 		Email:     email,
 		Password:  "SecurePassword123!",
-		Role:      "CLIENT",
 	}
 
 	regResp, err := testhelpers.PerformRequest(

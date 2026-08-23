@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS consultants (
 
     CONSTRAINT fk_consultant_user
         FOREIGN KEY (user_id)
-        REFERENCES users(id),
+        REFERENCES users(id) ON DELETE CASCADE,
 
     CONSTRAINT fk_consultant_profession
         FOREIGN KEY (profession_id)

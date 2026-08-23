@@ -12,6 +12,7 @@ type MockUserRepository struct {
 	FindByIDFn    func(ctx context.Context, id string) (*domain.User, error)
 	FindByEmailFn func(ctx context.Context, email domain.Email) (*domain.User, error)
 	DeleteFn      func(ctx context.Context, id string) error
+	ChangeRoleFn  func(ctx context.Context, userID string, newRole domain.Role) error
 }
 
 func (m *MockUserRepository) Save(ctx context.Context, user *domain.User) error {
@@ -32,4 +33,11 @@ func (m *MockUserRepository) FindByEmail(ctx context.Context, email domain.Email
 
 func (m *MockUserRepository) Delete(ctx context.Context, id string) error {
 	return m.DeleteFn(ctx, id)
+}
+
+func (m *MockUserRepository) ChangeRole(ctx context.Context, userID string, newRole domain.Role) error {
+	if m.ChangeRoleFn != nil {
+		return m.ChangeRoleFn(ctx, userID, newRole)
+	}
+	return nil
 }

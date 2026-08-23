@@ -15,6 +15,7 @@ import (
 type testRegisterConsultant struct {
 	consultantRepo *mocks.MockConsultantRepository
 	professionRepo *mocks.MockProfessionRepository
+	roleAssigner   *mocks.MockRoleAssigner
 	idGenerator    *shared_mocks.MockIDGenerator
 	clock          *shared_mocks.MockClock
 
@@ -48,12 +49,18 @@ func setUpRegisterConsultant(t *testing.T) *testRegisterConsultant {
 			return &prof, nil
 		},
 	}
+	roleAssigner := &mocks.MockRoleAssigner{
+		AssignConsultantRoleFn: func(ctx context.Context, userID string) error {
+			return nil
+		},
+	}
 
-	sut := NewRegisterConsultantUsecase(consultantRepo, professionRepo, idGenerator, clock)
+	sut := NewRegisterConsultantUsecase(consultantRepo, professionRepo, roleAssigner, idGenerator, clock)
 
 	return &testRegisterConsultant{
 		consultantRepo: consultantRepo,
 		professionRepo: professionRepo,
+		roleAssigner:   roleAssigner,
 		idGenerator:    idGenerator,
 		clock:          clock,
 		sut:            sut,
@@ -85,6 +92,12 @@ func TestRegisterConsultant_Execute(t *testing.T) {
 			return nil
 		}
 
+		var assignedUserID string
+		tc.roleAssigner.AssignConsultantRoleFn = func(ctx context.Context, uID string) error {
+			assignedUserID = uID
+			return nil
+		}
+
 		err := tc.sut.Execute(context.Background(), userID, validReq)
 		if err != nil {
 			t.Fatalf("expected no error, got %v", err)
@@ -112,6 +125,9 @@ func TestRegisterConsultant_Execute(t *testing.T) {
 		}
 		if !savedConsultant.UpdatedAt().Equal(now) {
 			t.Errorf("expected UpdatedAt %v, got %v", now, savedConsultant.UpdatedAt())
+		}
+		if assignedUserID != userID {
+			t.Errorf("expected assigned user ID %s, got %s", userID, assignedUserID)
 		}
 	})
 
@@ -238,6 +254,22 @@ func TestRegisterConsultant_Execute(t *testing.T) {
 		tc := setUpRegisterConsultant(t)
 		expectedErr := errors.New("failed to save consultant")
 		tc.consultantRepo.SaveFn = func(ctx context.Context, consultant *domain.Consultant) error {
+			return expectedErr
+		}
+
+		err := tc.sut.Execute(context.Background(), userID, validReq)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !errors.Is(err, expectedErr) {
+			t.Errorf("expected error %v, got %v", expectedErr, err)
+		}
+	})
+
+	t.Run("should fail when role assigner returns error", func(t *testing.T) {
+		tc := setUpRegisterConsultant(t)
+		expectedErr := errors.New("failed to assign role")
+		tc.roleAssigner.AssignConsultantRoleFn = func(ctx context.Context, uID string) error {
 			return expectedErr
 		}
 

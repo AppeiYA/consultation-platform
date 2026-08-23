@@ -12,6 +12,7 @@ import (
 type RegisterConsultant struct {
 	consultantRepo outbound.ConsultantRepository
 	professionRepo outbound.ProfessionRepository
+	identityAdapter outbound.RoleAssigner
 	idGenerator shared_outbound.IdentifierGenerator
 	clock shared_outbound.Clock
 }
@@ -19,12 +20,14 @@ type RegisterConsultant struct {
 func NewRegisterConsultantUsecase(
 	consultantRepo outbound.ConsultantRepository, 
 	professionRepo outbound.ProfessionRepository, 
+	identityAdapter outbound.RoleAssigner,
 	idGenerator shared_outbound.IdentifierGenerator, 
 	clock shared_outbound.Clock,
 	) *RegisterConsultant {
 	return &RegisterConsultant{
 		consultantRepo: consultantRepo,
 		professionRepo: professionRepo,
+		identityAdapter: identityAdapter,
 		idGenerator: idGenerator,
 		clock: clock,
 	}
@@ -87,5 +90,10 @@ func (uc *RegisterConsultant) Execute(ctx context.Context, userID string, req *d
 		uc.clock.Now(),
 	)
 
-	return uc.consultantRepo.Save(ctx, consultant)
+	err = uc.consultantRepo.Save(ctx, consultant)
+	if err != nil {
+		return err
+	}
+
+	return uc.identityAdapter.AssignConsultantRole(ctx, userID)
 }

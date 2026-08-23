@@ -5,7 +5,6 @@ type RegisterUserRequest struct {
 	LastName  string
 	Email     string
 	Password  string
-	Role      string
 }
 
 type RegisterUserResponse struct {

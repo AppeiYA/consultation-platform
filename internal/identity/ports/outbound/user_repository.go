@@ -16,4 +16,6 @@ type UserRepository interface {
 	FindByEmail(ctx context.Context, email domain.Email) (*domain.User, error)
 
 	Delete(ctx context.Context, id string) error
+
+	ChangeRole(ctx context.Context, userID string, newRole domain.Role) error
 }

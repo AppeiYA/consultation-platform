@@ -14,6 +14,7 @@ type Module struct {
 	LogoutUser   inbound.LogoutUserInt
 	ValidateSession inbound.ValidateSessionInt
 	GetCurrentUser inbound.GetCurrentUserInt
+	UpdateUserRole inbound.UpdateUserRoleInt
 }
 
 func NewModule(
@@ -53,6 +54,9 @@ func NewModule(
 			clock,
 		),
 		GetCurrentUser: usecase.NewGetCurrentUser(
+			userRepo,
+		),
+		UpdateUserRole: usecase.NewUpdateUserRoleUsecase(
 			userRepo,
 		),
 	}

@@ -19,7 +19,6 @@ func TestLoginUser_Integration(t *testing.T) {
 			LastName:  "Doe",
 			Email:     "jane.doe@example.com",
 			Password:  "SecurePassword123!",
-			Role:      "CLIENT",
 		}
 
 		regResp, err := performRequest(
@@ -143,7 +142,6 @@ func TestLoginUser_Integration(t *testing.T) {
 			LastName:  "Doe",
 			Email:     "jane.doe@example.com",
 			Password:  "SecurePassword123!",
-			Role:      "CLIENT",
 		}
 
 		regResp, err := performRequest(
