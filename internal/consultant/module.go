@@ -13,6 +13,7 @@ type Module struct {
 	UpdateConsultant   inbound.UpdateConsultantInt
 	SubmitVerification inbound.SubmitVerificationInt
 	CreateAvailability inbound.CreateAvailabilityInt
+	GetAvailability    inbound.GetAvailabilityInt
 	GetProfession      inbound.GetProfessionInt
 	ListProfessions     inbound.ListProfessionsInt
 }
@@ -54,6 +55,9 @@ func NewModule(
 			idGenerator,
 			consultantRepo,
 			clock,
+		),
+		GetAvailability: usecase.NewGetAvailabilityUsecase(
+			availabilityRepository,
 		),
 		GetProfession: usecase.NewGetProfessionUsecase(
 			professionRepo,

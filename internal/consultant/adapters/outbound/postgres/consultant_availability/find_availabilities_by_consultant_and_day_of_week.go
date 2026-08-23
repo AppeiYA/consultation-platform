@@ -10,7 +10,7 @@ import (
 var findAvailabilitiesByConsultantIDAndDayOfWeekQuery = `
 SELECT id, consultant_id, day_of_week, start_time, end_time, is_active, created_at, updated_at
 FROM consultant_availabilities
-WHERE consultant_id = $1 AND day_of_week = $2
+WHERE consultant_id = $1 AND day_of_week = $2 AND is_active = true
 `
 func (a *AvailabilityRepository) FindAvailabilitiesByConsultantIDAndDayOfWeek(ctx context.Context, consultantID string, dayOfWeek time.Weekday) ([]*domain.ConsultantAvailability, error) {
 	executor := a.repository.Executor(ctx)

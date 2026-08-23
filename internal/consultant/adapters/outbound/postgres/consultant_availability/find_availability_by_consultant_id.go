@@ -7,7 +7,7 @@ import (
 )
 
 var findAvailabilitiesByConsultantIDQuery = `
-SELECT * FROM consultant_availabilities WHERE consultant_id = $1
+SELECT * FROM consultant_availabilities WHERE consultant_id = $1 AND is_active = true
 `
 func (a *AvailabilityRepository) FindAvailabilitiesByConsultantID(
     ctx context.Context,

@@ -37,6 +37,7 @@ func RegisterConsultantRoutes(
 
 	// Public
 	consultantGroup.Get("/professions", consultantHandler.ListProfessions)
+	consultantGroup.Get("/:consultantID/availability", consultantHandler.GetAvailability)
 	consultantGroup.Get("/:id", consultantHandler.GetConsultantByID)
 	// consultantGroup.Get("/", consultantHandler.ListConsultants)
 
