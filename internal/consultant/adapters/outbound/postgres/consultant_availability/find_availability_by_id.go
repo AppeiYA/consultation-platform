@@ -2,6 +2,8 @@ package consultantAvailabilityRepo
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/AppeiYA/consultation-platform/internal/consultant/domain"
 )
@@ -23,6 +25,9 @@ func (a *AvailabilityRepository) FindAvailabilityByID(ctx context.Context, avail
 		availabilityID,
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.ErrAvailabilityNotFound
+		}
 		return nil, err
 	}
 

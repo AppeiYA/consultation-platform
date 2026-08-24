@@ -110,11 +110,11 @@ func TestGetAvailability_Integration(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, availabilities, 2)
-		require.Equal(t, 1, availabilities[0].DayOfWeek)
+		require.Equal(t, "Monday", availabilities[0].DayOfWeek)
 		require.Equal(t, "09:00", availabilities[0].StartTime)
 		require.Equal(t, "11:00", availabilities[0].EndTime)
 
-		require.Equal(t, 3, availabilities[1].DayOfWeek)
+		require.Equal(t, "Wednesday", availabilities[1].DayOfWeek)
 		require.Equal(t, "14:00", availabilities[1].StartTime)
 		require.Equal(t, "16:00", availabilities[1].EndTime)
 	})
@@ -196,7 +196,7 @@ func TestGetAvailability_Integration(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, availabilities, 1)
-		require.Equal(t, 2, availabilities[0].DayOfWeek)
+		require.Equal(t, "Tuesday", availabilities[0].DayOfWeek)
 		require.Equal(t, "10:00", availabilities[0].StartTime)
 		require.Equal(t, "12:00", availabilities[0].EndTime)
 	})
@@ -455,7 +455,7 @@ func TestGetAvailability_Integration(t *testing.T) {
 		var availsA []consultant_dto.GetAvailabilityResponse
 		json.Unmarshal(bA, &availsA)
 		require.Len(t, availsA, 1)
-		require.Equal(t, 1, availsA[0].DayOfWeek)
+		require.Equal(t, "Monday", availsA[0].DayOfWeek)
 		require.Equal(t, "09:00", availsA[0].StartTime)
 
 		// Fetch availability for consultant 2
@@ -468,7 +468,7 @@ func TestGetAvailability_Integration(t *testing.T) {
 		var availsB []consultant_dto.GetAvailabilityResponse
 		json.Unmarshal(bB, &availsB)
 		require.Len(t, availsB, 1)
-		require.Equal(t, 2, availsB[0].DayOfWeek)
+		require.Equal(t, "Tuesday", availsB[0].DayOfWeek)
 		require.Equal(t, "14:00", availsB[0].StartTime)
 	})
 }

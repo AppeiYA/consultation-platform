@@ -11,6 +11,9 @@ var ConsultantAvailabilityIDPrefix = "conav"
 var (
 	ErrInvalidTimeRange = custom_errors.BadException("invalid time range")
 	ErrAvailabilityOverlap = custom_errors.ConflictError("availability overlaps with existing availability")
+	ErrAvailabilityNotFound = custom_errors.NotFoundError("availability not found")
+	ErrAvailabilityAlreadyDeactivated = custom_errors.ConflictError("availability is already deactivated")
+	ErrAvailabilityAlreadyActivated = custom_errors.ConflictError("availability is already activated")
 )
 
 type ConsultantAvailability struct {
@@ -123,5 +126,23 @@ func (a *ConsultantAvailability) Overlaps(
 	}
 
 	return start.Before(a.endTime) && end.After(a.startTime)
+}
+
+func (a *ConsultantAvailability) Update(
+	dayOfWeek time.Weekday,
+	startTime TimeOfDay,
+	endTime TimeOfDay,
+	now time.Time,
+) error {
+	if !startTime.Before(endTime) {
+		return ErrInvalidTimeRange
+	}
+
+	a.dayOfWeek = dayOfWeek
+	a.startTime = startTime
+	a.endTime = endTime
+	a.updatedAt = now
+
+	return nil
 }
 

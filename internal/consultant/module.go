@@ -14,6 +14,9 @@ type Module struct {
 	SubmitVerification inbound.SubmitVerificationInt
 	CreateAvailability inbound.CreateAvailabilityInt
 	GetAvailability    inbound.GetAvailabilityInt
+	UpdateAvailability inbound.UpdateAvailabilityInt
+	ActivateAvailability inbound.ActivateAvailabilityInt
+	DeactivateAvailability inbound.DeactivateAvailabilityInt
 	GetProfession      inbound.GetProfessionInt
 	ListProfessions     inbound.ListProfessionsInt
 }
@@ -60,6 +63,21 @@ func NewModule(
 		),
 		GetAvailability: usecase.NewGetAvailabilityUsecase(
 			availabilityRepository,
+		),
+		UpdateAvailability: usecase.NewUpdateAvailabilityUsecase(
+			availabilityRepository,
+			consultantRepo,
+			clock,
+		),
+		ActivateAvailability: usecase.NewActivateAvailabilityUsecase(
+			availabilityRepository,
+			consultantRepo,
+			clock,
+		),
+		DeactivateAvailability: usecase.NewDeactivateAvailabilityUsecase(
+			availabilityRepository,
+			consultantRepo,
+			clock,
 		),
 		GetProfession: usecase.NewGetProfessionUsecase(
 			professionRepo,

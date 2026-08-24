@@ -38,4 +38,14 @@ type AvailabilityRepository interface {
 		ctx context.Context,
 		id string,
 	) error
+
+	DeactivateAvailability(
+		ctx context.Context,
+		id string,
+	) error
+
+	ActivateAvailability(
+		ctx context.Context,
+		id string,
+	) error
 }

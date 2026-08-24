@@ -29,6 +29,21 @@ func RegisterConsultantRoutes(
 		identityMiddleware.Authenticate,
 		consultantHandler.CreateAvailability,
 	)
+	consultantGroup.Put(
+		"/availability",
+		identityMiddleware.Authenticate,
+		consultantHandler.UpdateAvailability,
+	)
+	consultantGroup.Patch(
+		"/availability/:availabilityID/activate",
+		identityMiddleware.Authenticate,
+		consultantHandler.ActivateAvailability,
+	)
+	consultantGroup.Patch(
+		"/availability/:availabilityID/deactivate",
+		identityMiddleware.Authenticate,
+		consultantHandler.DeactivateAvailability,
+	)
 	consultantGroup.Post(
 		"/verification",
 		identityMiddleware.Authenticate,

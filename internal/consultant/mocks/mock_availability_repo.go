@@ -14,6 +14,8 @@ type MockAvailabilityRepository struct {
 	FindAvailabilitiesByConsultantIDAndDayOfWeekFn func(ctx context.Context, consultantID string, dayOfWeek time.Weekday) ([]*domain.ConsultantAvailability, error)
 	UpdateAvailabilityFn func(ctx context.Context, availability *domain.ConsultantAvailability) error
 	DeleteAvailabilityFn func(ctx context.Context, id string) error
+	ActivateAvailabilityFn func(ctx context.Context, id string) error
+	DeactivateAvailabilityFn func(ctx context.Context, id string) error
 }
 
 func (m *MockAvailabilityRepository) SaveAvailability(ctx context.Context, availability *domain.ConsultantAvailability) error {
@@ -54,6 +56,20 @@ func (m *MockAvailabilityRepository) UpdateAvailability(ctx context.Context, ava
 func (m *MockAvailabilityRepository) DeleteAvailability(ctx context.Context, id string) error {
 	if m.DeleteAvailabilityFn != nil {
 		return m.DeleteAvailabilityFn(ctx, id)
+	}
+	return nil
+}
+
+func (m *MockAvailabilityRepository) ActivateAvailability(ctx context.Context, id string) error {
+	if m.ActivateAvailabilityFn != nil {
+		return m.ActivateAvailabilityFn(ctx, id)
+	}
+	return nil
+}
+
+func (m *MockAvailabilityRepository) DeactivateAvailability(ctx context.Context, id string) error {
+	if m.DeactivateAvailabilityFn != nil {
+		return m.DeactivateAvailabilityFn(ctx, id)
 	}
 	return nil
 }
