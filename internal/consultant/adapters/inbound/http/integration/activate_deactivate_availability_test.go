@@ -88,7 +88,7 @@ func TestActivateDeactivateAvailability_Integration(t *testing.T) {
 		require.True(t, deactRes.Success)
 		require.Equal(t, "Availability deactivated successfully", deactRes.Message)
 
-		// 6. Verify GET availability no longer includes deactivated slot (since it filters active slots)
+		// 6. Verify GET availability includes deactivated slot with IsActive false
 		getAvail2, err := testhelpers.PerformRequest(harness.App, http.MethodGet, "/test/v1/consultants/"+consultantID+"/availability", nil)
 		require.NoError(t, err)
 		getAvailRes2 := testhelpers.DecodeResponse(t, getAvail2)
@@ -96,7 +96,8 @@ func TestActivateDeactivateAvailability_Integration(t *testing.T) {
 		d2, _ := json.Marshal(getAvailRes2.Data)
 		var avails2 []consultant_dto.GetAvailabilityResponse
 		json.Unmarshal(d2, &avails2)
-		require.Empty(t, avails2)
+		require.Len(t, avails2, 1)
+		require.False(t, avails2[0].IsActive)
 
 		// 7. Deactivating already deactivated slot returns 409 Conflict
 		deactAgainResp, err := testhelpers.PerformRequestWithCookie(
@@ -130,7 +131,7 @@ func TestActivateDeactivateAvailability_Integration(t *testing.T) {
 		require.True(t, actRes.Success)
 		require.Equal(t, "Availability activated successfully", actRes.Message)
 
-		// 9. Verify GET availability includes the reactivated slot again
+		// 9. Verify GET availability includes the reactivated slot with IsActive true
 		getAvail3, err := testhelpers.PerformRequest(harness.App, http.MethodGet, "/test/v1/consultants/"+consultantID+"/availability", nil)
 		require.NoError(t, err)
 		getAvailRes3 := testhelpers.DecodeResponse(t, getAvail3)
@@ -140,6 +141,7 @@ func TestActivateDeactivateAvailability_Integration(t *testing.T) {
 		json.Unmarshal(d3, &avails3)
 		require.Len(t, avails3, 1)
 		require.Equal(t, availID, avails3[0].AvailabilityID)
+		require.True(t, avails3[0].IsActive)
 
 		// 10. Activating already active slot returns 409 Conflict
 		actAgainResp, err := testhelpers.PerformRequestWithCookie(
