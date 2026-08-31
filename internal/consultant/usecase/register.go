@@ -4,32 +4,35 @@ import (
 	"context"
 
 	"github.com/AppeiYA/consultation-platform/internal/consultant/domain"
-	shared_outbound "github.com/AppeiYA/consultation-platform/internal/shared/ports/outbound"
 	"github.com/AppeiYA/consultation-platform/internal/consultant/ports/outbound"
 	"github.com/AppeiYA/consultation-platform/internal/consultant/usecase/dto"
+	shared_outbound "github.com/AppeiYA/consultation-platform/internal/shared/ports/outbound"
 )
 
 type RegisterConsultant struct {
-	consultantRepo outbound.ConsultantRepository
-	professionRepo outbound.ProfessionRepository
+	consultantRepo  outbound.ConsultantRepository
+	professionRepo  outbound.ProfessionRepository
+	expertiseRepo   outbound.ExpertiseRepository
 	identityAdapter outbound.RoleAssigner
-	idGenerator shared_outbound.IdentifierGenerator
-	clock shared_outbound.Clock
+	idGenerator     shared_outbound.IdentifierGenerator
+	clock           shared_outbound.Clock
 }
 
 func NewRegisterConsultantUsecase(
-	consultantRepo outbound.ConsultantRepository, 
-	professionRepo outbound.ProfessionRepository, 
+	consultantRepo outbound.ConsultantRepository,
+	professionRepo outbound.ProfessionRepository,
+	expertiseRepo outbound.ExpertiseRepository,
 	identityAdapter outbound.RoleAssigner,
-	idGenerator shared_outbound.IdentifierGenerator, 
+	idGenerator shared_outbound.IdentifierGenerator,
 	clock shared_outbound.Clock,
-	) *RegisterConsultant {
+) *RegisterConsultant {
 	return &RegisterConsultant{
-		consultantRepo: consultantRepo,
-		professionRepo: professionRepo,
+		consultantRepo:  consultantRepo,
+		professionRepo:  professionRepo,
+		expertiseRepo:   expertiseRepo,
 		identityAdapter: identityAdapter,
-		idGenerator: idGenerator,
-		clock: clock,
+		idGenerator:     idGenerator,
+		clock:           clock,
 	}
 }
 
@@ -47,7 +50,7 @@ func (uc *RegisterConsultant) Execute(ctx context.Context, userID string, req *d
 		return domain.ErrInvalidProfession
 	}
 
-	// check if profession exists 
+	// check if profession exists
 	profession, err := uc.professionRepo.GetProfessionByID(ctx, req.ProfessionID)
 	if err != nil {
 		return err
@@ -56,13 +59,13 @@ func (uc *RegisterConsultant) Execute(ctx context.Context, userID string, req *d
 		return domain.ErrInvalidProfession
 	}
 
-	// genarate a new ID for consultant
+	// generate a new ID for consultant
 	newID, err := uc.idGenerator.Generate(domain.ConsultantIDPrefix)
 	if err != nil {
 		return err
 	}
 
-	// check correct display name 
+	// check correct display name
 	displayName, err := domain.NewDisplayName(req.DisplayName)
 	if err != nil {
 		return err
@@ -71,7 +74,7 @@ func (uc *RegisterConsultant) Execute(ctx context.Context, userID string, req *d
 	// check correct bio
 	bio, err := domain.NewBio(req.Bio)
 	if err != nil {
-		return err 
+		return err
 	}
 
 	yearsExperience, err := domain.NewYearsExperience(req.YearsExperience)
@@ -93,6 +96,24 @@ func (uc *RegisterConsultant) Execute(ctx context.Context, userID string, req *d
 	err = uc.consultantRepo.Save(ctx, consultant)
 	if err != nil {
 		return err
+	}
+
+	if len(req.Expertises) > 0 {
+		expertiseEntities := make([]*domain.Expertise, 0, len(req.Expertises))
+		for _, name := range req.Expertises {
+			expID, err := uc.idGenerator.Generate(domain.ExpertiseIDPrefix)
+			if err != nil {
+				return err
+			}
+			exp, err := domain.NewExpertise(expID, newID, name)
+			if err != nil {
+				return err
+			}
+			expertiseEntities = append(expertiseEntities, exp)
+		}
+		if err := uc.expertiseRepo.SaveMany(ctx, expertiseEntities); err != nil {
+			return err
+		}
 	}
 
 	return uc.identityAdapter.AssignConsultantRole(ctx, userID)

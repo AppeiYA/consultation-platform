@@ -5,15 +5,16 @@ import "time"
 const ConsultantIDPrefix = "con"
 
 type Consultant struct {
-	id                string
-	userID            string
-	professionID        string
-	displayName       DisplayName
-	bio               Bio
-	yearsExperience   YearsExperience
+	id                 string
+	userID             string
+	professionID       string
+	displayName        DisplayName
+	bio                Bio
+	yearsExperience    YearsExperience
 	isAcceptingClients bool
-	createdAt         time.Time
-	updatedAt         time.Time
+	expertises         []Expertise
+	createdAt          time.Time
+	updatedAt          time.Time
 }
 
 func NewConsultant(
@@ -26,15 +27,16 @@ func NewConsultant(
 	now time.Time,
 ) *Consultant {
 	return &Consultant{
-		id: id,
-		userID: userID,
-		professionID: professionID,
-		displayName: displayName,
-		bio: bio,
-		yearsExperience: yearsExperience,
+		id:                 id,
+		userID:             userID,
+		professionID:       professionID,
+		displayName:        displayName,
+		bio:                bio,
+		yearsExperience:    yearsExperience,
 		isAcceptingClients: true,
-		createdAt: now,
-		updatedAt: now,
+		expertises:         nil,
+		createdAt:          now,
+		updatedAt:          now,
 	}
 }
 
@@ -62,15 +64,16 @@ func ReconstitueConsultant(
 		return nil, err
 	}
 	return &Consultant{
-		id: id,
-		userID: userID,
-		professionID: professionID,
-		displayName: validDisplayName,
-		bio: validBio,
-		yearsExperience: validYearsExperience,
+		id:                 id,
+		userID:             userID,
+		professionID:       professionID,
+		displayName:        validDisplayName,
+		bio:                validBio,
+		yearsExperience:    validYearsExperience,
 		isAcceptingClients: isAcceptingClients,
-		createdAt: createdAt,
-		updatedAt: updatedAt,
+		expertises:         nil,
+		createdAt:          createdAt,
+		updatedAt:          updatedAt,
 	}, nil
 }
 
@@ -100,6 +103,25 @@ func (c *Consultant) YearsExperience() YearsExperience {
 
 func (c *Consultant) IsAcceptingClients() bool {
 	return c.isAcceptingClients
+}
+
+func (c *Consultant) Expertises() []Expertise {
+	if len(c.expertises) == 0 {
+		return nil
+	}
+	cloned := make([]Expertise, len(c.expertises))
+	copy(cloned, c.expertises)
+	return cloned
+}
+
+func (c *Consultant) SetExpertises(expertises []Expertise) {
+	if len(expertises) == 0 {
+		c.expertises = nil
+		return
+	}
+	cloned := make([]Expertise, len(expertises))
+	copy(cloned, expertises)
+	c.expertises = cloned
 }
 
 func (c *Consultant) CreatedAt() time.Time {

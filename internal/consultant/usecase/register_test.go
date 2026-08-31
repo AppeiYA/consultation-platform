@@ -55,7 +55,9 @@ func setUpRegisterConsultant(t *testing.T) *testRegisterConsultant {
 		},
 	}
 
-	sut := NewRegisterConsultantUsecase(consultantRepo, professionRepo, roleAssigner, idGenerator, clock)
+	expertiseRepo := &mocks.MockExpertiseRepository{}
+
+	sut := NewRegisterConsultantUsecase(consultantRepo, professionRepo, expertiseRepo, roleAssigner, idGenerator, clock)
 
 	return &testRegisterConsultant{
 		consultantRepo: consultantRepo,

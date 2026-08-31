@@ -5,21 +5,19 @@ import (
 )
 
 type PublicConsultantResponseDTO struct {
-	ID   string `json:"id"`
-	Profession string `json:"profession"`
-	DisplayName string `json:"display_name"`
-	UserID string `json:"user_id"`
-
-	Bio string `json:"bio"`
-
-	YearsExperience int `json:"years_experience"`
-	IsAcceptingClients bool `json:"is_accepting_clients"`
-	CreatedAt string `json:"created_at"`
+	ID                 string   `json:"id"`
+	Profession         string   `json:"profession"`
+	DisplayName        string   `json:"display_name"`
+	UserID             string   `json:"user_id"`
+	Bio                string   `json:"bio"`
+	YearsExperience    int      `json:"years_experience"`
+	IsAcceptingClients bool     `json:"is_accepting_clients"`
+	Expertises         []string `json:"expertises"`
+	CreatedAt          string   `json:"created_at"`
 }
 
 type PrivateConsultantResponseDTO struct {
 	PublicConsultantResponseDTO
-
 	UpdatedAt string `json:"updated_at"`
 }
 
@@ -31,6 +29,7 @@ func (dto *PublicConsultantResponseDTO) FromUsecaseDTO(consultant *dto.GetConsul
 	dto.Bio = consultant.Bio
 	dto.YearsExperience = consultant.YearsExperience
 	dto.IsAcceptingClients = consultant.IsAcceptingClients
+	dto.Expertises = consultant.Expertises
 	dto.CreatedAt = consultant.CreatedAt
 }
 

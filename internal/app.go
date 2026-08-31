@@ -11,6 +11,9 @@ import (
 	"time"
 
 	consultationcase_http "github.com/AppeiYA/consultation-platform/internal/consultationcase/adapters/inbound/http"
+	"github.com/AppeiYA/consultation-platform/internal/expertmatching"
+
+	expertmatching_http "github.com/AppeiYA/consultation-platform/internal/expertmatching/adapters/inbound/http"
 
 	"github.com/AppeiYA/consultation-platform/internal/consultant"
 	consultant_http "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/inbound/http"
@@ -47,6 +50,9 @@ type App struct {
 	consultationCaseIdentityAdapter *consultationCaseIdentityAdapter.ClientVerifier
 	consultationCaseModule *consultationcase.Module
 	consultationCaseHandler *consultationcase_http.ConsultationCaseHandler
+
+	expertMatchingModule *expertmatching.Module
+	expertMatchingHandler *expertmatching_http.ExpertMatchingHandler
 }
 
 func New() (*App, error) {

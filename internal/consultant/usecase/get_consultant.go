@@ -11,16 +11,22 @@ import (
 type GetConsultant struct {
 	consultantRepo outbound.ConsultantRepository
 	professionRepo outbound.ProfessionRepository
+	expertiseRepo  outbound.ExpertiseRepository
 }
 
-func NewGetConsultantUsecase(consultantRepo outbound.ConsultantRepository, professionRepo outbound.ProfessionRepository) *GetConsultant {
+func NewGetConsultantUsecase(
+	consultantRepo outbound.ConsultantRepository,
+	professionRepo outbound.ProfessionRepository,
+	expertiseRepo outbound.ExpertiseRepository,
+) *GetConsultant {
 	return &GetConsultant{
 		consultantRepo: consultantRepo,
 		professionRepo: professionRepo,
+		expertiseRepo:  expertiseRepo,
 	}
 }
 
-func(uc *GetConsultant) ByID(ctx context.Context, id string) (*dto.GetConsultantResponseDto, error) {
+func (uc *GetConsultant) ByID(ctx context.Context, id string) (*dto.GetConsultantResponseDto, error) {
 	consultant, err := uc.consultantRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -34,16 +40,27 @@ func(uc *GetConsultant) ByID(ctx context.Context, id string) (*dto.GetConsultant
 		return nil, domain.ErrInvalidProfession
 	}
 
+	expertises, err := uc.expertiseRepo.FindByConsultantID(ctx, consultant.ID())
+	if err != nil {
+		return nil, err
+	}
+
+	expertiseNames := make([]string, 0, len(expertises))
+	for _, exp := range expertises {
+		expertiseNames = append(expertiseNames, exp.Name())
+	}
+
 	return &dto.GetConsultantResponseDto{
-		ID: consultant.ID(),
-		Profession: profession.Name(),
-		DisplayName: consultant.DisplayName().String(),
-		UserID: consultant.UserID(),
-		Bio: consultant.Bio().String(),
-		YearsExperience: consultant.YearsExperience().Int(),
+		ID:                 consultant.ID(),
+		Profession:         profession.Name(),
+		DisplayName:        consultant.DisplayName().String(),
+		UserID:             consultant.UserID(),
+		Bio:                consultant.Bio().String(),
+		YearsExperience:    consultant.YearsExperience().Int(),
 		IsAcceptingClients: consultant.IsAcceptingClients(),
-		CreatedAt: consultant.CreatedAt().Format("2006-01-02 15:04:05"),
-		UpdatedAt: consultant.UpdatedAt().Format("2006-01-02 15:04:05"),
+		Expertises:         expertiseNames,
+		CreatedAt:          consultant.CreatedAt().Format("2006-01-02 15:04:05"),
+		UpdatedAt:          consultant.UpdatedAt().Format("2006-01-02 15:04:05"),
 	}, nil
 }
 
@@ -61,15 +78,26 @@ func (uc *GetConsultant) ByUserID(ctx context.Context, userID string) (*dto.GetC
 		return nil, domain.ErrInvalidProfession
 	}
 
+	expertises, err := uc.expertiseRepo.FindByConsultantID(ctx, consultant.ID())
+	if err != nil {
+		return nil, err
+	}
+
+	expertiseNames := make([]string, 0, len(expertises))
+	for _, exp := range expertises {
+		expertiseNames = append(expertiseNames, exp.Name())
+	}
+
 	return &dto.GetConsultantResponseDto{
-		ID: consultant.ID(),
-		Profession: profession.Name(),
-		DisplayName: consultant.DisplayName().String(),
-		UserID: consultant.UserID(),
-		Bio: consultant.Bio().String(),
-		YearsExperience: consultant.YearsExperience().Int(),
+		ID:                 consultant.ID(),
+		Profession:         profession.Name(),
+		DisplayName:        consultant.DisplayName().String(),
+		UserID:             consultant.UserID(),
+		Bio:                consultant.Bio().String(),
+		YearsExperience:    consultant.YearsExperience().Int(),
 		IsAcceptingClients: consultant.IsAcceptingClients(),
-		CreatedAt: consultant.CreatedAt().Format("2006-01-02 15:04:05"),
-		UpdatedAt: consultant.UpdatedAt().Format("2006-01-02 15:04:05"),
+		Expertises:         expertiseNames,
+		CreatedAt:          consultant.CreatedAt().Format("2006-01-02 15:04:05"),
+		UpdatedAt:          consultant.UpdatedAt().Format("2006-01-02 15:04:05"),
 	}, nil
 }

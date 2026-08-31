@@ -3,19 +3,19 @@ package dto
 import usecase_dto "github.com/AppeiYA/consultation-platform/internal/consultant/usecase/dto"
 
 type RegisterConsultantDTO struct {
-	ProfessionID string `json:"profession_id"`
-	DisplayName string `json:"display_name"`
-
-	Bio string `json:"bio"`
-
-	YearsExperience int `json:"years_experience"`
+	ProfessionID    string   `json:"profession_id"`
+	DisplayName     string   `json:"display_name"`
+	Bio             string   `json:"bio"`
+	YearsExperience int      `json:"years_experience"`
+	Expertises      []string `json:"expertises,omitempty"`
 }
 
 func (dto *RegisterConsultantDTO) ToUsecaseDTO() *usecase_dto.RegisterConsultantDTO {
 	return &usecase_dto.RegisterConsultantDTO{
-		ProfessionID: dto.ProfessionID,
-		DisplayName: dto.DisplayName,
-		Bio: dto.Bio,
+		ProfessionID:    dto.ProfessionID,
+		DisplayName:     dto.DisplayName,
+		Bio:             dto.Bio,
 		YearsExperience: dto.YearsExperience,
+		Expertises:      dto.Expertises,
 	}
 }

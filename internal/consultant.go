@@ -7,6 +7,7 @@ import (
 	consultantIdentityAdapter "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/external/identity"
 	consultantRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant"
 	consultantAvailabilityRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant_availability"
+	consultantExpertiseRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant_expertise"
 	consultantVerificationRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/consultant_verification"
 	professionRepo "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/postgres/profession"
 	"github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/verification"
@@ -27,6 +28,7 @@ func (a *App) registerConsultantModule(
 	verificationRepo := consultantVerificationRepo.NewVerificationRepository(db, clock)
 	availabilityRepo := consultantAvailabilityRepo.NewAvailabilityRepository(db, clock)
 	professionRepo := professionRepo.NewProfessionRepository(db, clock)
+	expertiseRepo := consultantExpertiseRepo.NewConsultantExpertiseRepository(&db)
 
 	consultantModule := consultant.NewModule(
 		consultantRepo,
@@ -34,6 +36,7 @@ func (a *App) registerConsultantModule(
 		verificationRepo,
 		availabilityRepo,
 		professionRepo,
+		expertiseRepo,
 		roleAssigner,
 		idGenerator,
 		clock,

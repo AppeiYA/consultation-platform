@@ -48,7 +48,9 @@ func setUpGetConsultant(t *testing.T) *testGetConsultant {
 		},
 	}
 
-	sut := NewGetConsultantUsecase(consultantRepo, professionRepo)
+	expertiseRepo := &mocks.MockExpertiseRepository{}
+
+	sut := NewGetConsultantUsecase(consultantRepo, professionRepo, expertiseRepo)
 
 	return &testGetConsultant{
 		consultantRepo: consultantRepo,

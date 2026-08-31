@@ -2,7 +2,6 @@ package http
 
 import (
 	identity_middleware "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http/middleware"
-
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -50,11 +49,32 @@ func RegisterConsultantRoutes(
 		consultantHandler.SubmitVerification,
 	)
 
+	// Expertises (Protected)
+	consultantGroup.Get(
+		"/me/expertises",
+		identityMiddleware.Authenticate,
+		consultantHandler.ListMyExpertises,
+	)
+	consultantGroup.Post(
+		"/me/expertises",
+		identityMiddleware.Authenticate,
+		consultantHandler.AddExpertise,
+	)
+	consultantGroup.Put(
+		"/me/expertises",
+		identityMiddleware.Authenticate,
+		consultantHandler.ReplaceExpertises,
+	)
+	consultantGroup.Delete(
+		"/me/expertises/:expertiseID",
+		identityMiddleware.Authenticate,
+		consultantHandler.RemoveExpertise,
+	)
+
 	// Public
 	consultantGroup.Get("/professions", consultantHandler.ListProfessions)
 	consultantGroup.Get("/:consultantID/availability", consultantHandler.GetAvailability)
 	consultantGroup.Get("/:id", consultantHandler.GetConsultantByID)
-	// consultantGroup.Get("/", consultantHandler.ListConsultants)
 
 	consultantGroup.Put(
 		"/profile",

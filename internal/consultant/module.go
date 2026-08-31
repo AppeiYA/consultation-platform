@@ -8,17 +8,21 @@ import (
 )
 
 type Module struct {
-	RegisterConsultant inbound.RegisterConsultantInt
-	GetConsultant      inbound.GetConsultantInt
-	UpdateConsultant   inbound.UpdateConsultantInt
-	SubmitVerification inbound.SubmitVerificationInt
-	CreateAvailability inbound.CreateAvailabilityInt
-	GetAvailability    inbound.GetAvailabilityInt
-	UpdateAvailability inbound.UpdateAvailabilityInt
-	ActivateAvailability inbound.ActivateAvailabilityInt
+	RegisterConsultant     inbound.RegisterConsultantInt
+	GetConsultant          inbound.GetConsultantInt
+	UpdateConsultant       inbound.UpdateConsultantInt
+	SubmitVerification     inbound.SubmitVerificationInt
+	CreateAvailability     inbound.CreateAvailabilityInt
+	GetAvailability        inbound.GetAvailabilityInt
+	UpdateAvailability     inbound.UpdateAvailabilityInt
+	ActivateAvailability   inbound.ActivateAvailabilityInt
 	DeactivateAvailability inbound.DeactivateAvailabilityInt
-	GetProfession      inbound.GetProfessionInt
-	ListProfessions     inbound.ListProfessionsInt
+	GetProfession          inbound.GetProfessionInt
+	ListProfessions        inbound.ListProfessionsInt
+	AddExpertise           inbound.AddExpertiseInt
+	RemoveExpertise        inbound.RemoveExpertiseInt
+	ReplaceExpertises      inbound.ReplaceExpertisesInt
+	ListMyExpertises       inbound.ListMyExpertisesInt
 }
 
 func NewModule(
@@ -27,21 +31,24 @@ func NewModule(
 	verificationRepository outbound.VerificationRepository,
 	availabilityRepository outbound.AvailabilityRepository,
 	professionRepo outbound.ProfessionRepository,
+	expertiseRepo outbound.ExpertiseRepository,
 	identityAdapter outbound.RoleAssigner,
 	idGenerator shared_outbound.IdentifierGenerator,
 	clock shared_outbound.Clock,
 ) *Module {
 	return &Module{
 		RegisterConsultant: usecase.NewRegisterConsultantUsecase(
-			consultantRepo, 
+			consultantRepo,
 			professionRepo,
+			expertiseRepo,
 			identityAdapter,
-			idGenerator, 
+			idGenerator,
 			clock,
 		),
 		GetConsultant: usecase.NewGetConsultantUsecase(
 			consultantRepo,
 			professionRepo,
+			expertiseRepo,
 		),
 		UpdateConsultant: usecase.NewUpdateConsultantUsecase(
 			consultantRepo,
@@ -52,7 +59,7 @@ func NewModule(
 			consultantRepo,
 			idGenerator,
 			clock,
-			verificationService, 
+			verificationService,
 			verificationRepository,
 		),
 		CreateAvailability: usecase.NewCreateAvailabilityUsecase(
@@ -84,6 +91,24 @@ func NewModule(
 		),
 		ListProfessions: usecase.NewListProfessionsUsecase(
 			professionRepo,
+		),
+		AddExpertise: usecase.NewAddExpertiseUsecase(
+			consultantRepo,
+			expertiseRepo,
+			idGenerator,
+		),
+		RemoveExpertise: usecase.NewRemoveExpertiseUsecase(
+			consultantRepo,
+			expertiseRepo,
+		),
+		ReplaceExpertises: usecase.NewReplaceExpertisesUsecase(
+			consultantRepo,
+			expertiseRepo,
+			idGenerator,
+		),
+		ListMyExpertises: usecase.NewListMyExpertisesUsecase(
+			consultantRepo,
+			expertiseRepo,
 		),
 	}
 }
