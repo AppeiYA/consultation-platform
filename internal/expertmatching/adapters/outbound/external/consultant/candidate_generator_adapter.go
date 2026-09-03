@@ -49,8 +49,20 @@ func (a *CandidateGeneratorAdapter) GenerateCandidates(
 		WHERE c.is_accepting_clients = true
 		  AND (
 		      $1 = '' 
-		      OR UPPER(p.name) = UPPER($1) 
+		      OR p.id = $1
+		      OR UPPER(p.name) = UPPER($1)
+		      OR REPLACE(UPPER(p.name), '_', ' ') = REPLACE(UPPER($1), '_', ' ')
+		      OR UPPER(p.name) = UPPER(REPLACE($1, ' ', '_'))
 		      OR p.name ILIKE '%' || $1 || '%'
+		      OR EXISTS (
+		          SELECT 1 FROM consultant_expertises ce2
+		          WHERE ce2.consultant_id = c.id
+		            AND (
+		                UPPER(ce2.name) = UPPER($1)
+		                OR ce2.name ILIKE '%' || $1 || '%'
+		                OR $1 ILIKE '%' || ce2.name || '%'
+		            )
+		      )
 		  )
 		GROUP BY c.id, p.name, c.years_experience, c.bio, c.is_accepting_clients
 	`

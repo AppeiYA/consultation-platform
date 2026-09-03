@@ -32,6 +32,7 @@ consultant matches the consultation case.
 		candidate-generation stage and must NOT be used as ranking advantages.
 	11. Be conservative when the available information does not support a strong match.
 	12. Do not use consultant ID as a factor in determining suitability.
+	13. For each reason, the "factor" MUST strictly be one of: "category", "expertise", "experience", "availability", "language", "verification".
 
 	Return valid JSON matching the supplied response schema.
 	`)

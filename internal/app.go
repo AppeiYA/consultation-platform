@@ -19,6 +19,7 @@ import (
 	consultant_http "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/inbound/http"
 	consultantIdentityAdapter "github.com/AppeiYA/consultation-platform/internal/consultant/adapters/outbound/external/identity"
 	"github.com/AppeiYA/consultation-platform/internal/consultationcase"
+	consultationCaseExpertMatchingAdapter "github.com/AppeiYA/consultation-platform/internal/consultationcase/adapters/outbound/external/expertmatching"
 	consultationCaseIdentityAdapter "github.com/AppeiYA/consultation-platform/internal/consultationcase/adapters/outbound/external/identity"
 	"github.com/AppeiYA/consultation-platform/internal/identity"
 	identity_http "github.com/AppeiYA/consultation-platform/internal/identity/adapters/inbound/http"
@@ -33,6 +34,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/hibiken/asynq"
 )
 
 type App struct {
@@ -123,10 +125,28 @@ func New() (*App, error) {
 		idGenerator,
 		roleAssigner,
 	)
+
+	// expert matching
+	asynqClient := asynq.NewClient(asynq.RedisClientOpt{
+		Addr:     cfg.Redis.Address,
+		Username: cfg.Redis.Username,
+		Password: cfg.Redis.Password,
+		DB:       cfg.Redis.DB,
+	})
+	a.registerExpertMatchingModule(
+		repository,
+		asynqClient,
+		clock,
+		idGenerator,
+		nil,
+	)
+
 	clientVerifier := consultationCaseIdentityAdapter.NewClientVerifier(a.identityModule)
+	matchingStarter := consultationCaseExpertMatchingAdapter.NewMatchingStarterAdapter(a.expertMatchingModule)
 	a.registerConsultationCaseModule(
 		repository,
 		clientVerifier,
+		matchingStarter,
 		clock,
 		idGenerator,
 	)

@@ -12,7 +12,7 @@ import (
 type StartMatchingUsecase struct {
 	caseReader    outbound.CaseReader
 	runRepository outbound.MatchingRunRepository
-	jobEnqueuer   outbound.MatchingJobEnqueuer
+	dispatcher    outbound.MatchingJobDispatcher
 	idGenerator   shared_outbound.IdentifierGenerator
 	clock         shared_outbound.Clock
 }
@@ -20,14 +20,14 @@ type StartMatchingUsecase struct {
 func NewStartMatchingUsecase(
 	caseReader outbound.CaseReader,
 	runRepository outbound.MatchingRunRepository,
-	jobEnqueuer outbound.MatchingJobEnqueuer,
+	dispatcher outbound.MatchingJobDispatcher,
 	idGenerator shared_outbound.IdentifierGenerator,
 	clock shared_outbound.Clock,
 ) *StartMatchingUsecase {
 	return &StartMatchingUsecase{
 		caseReader:    caseReader,
 		runRepository: runRepository,
-		jobEnqueuer:   jobEnqueuer,
+		dispatcher:    dispatcher,
 		idGenerator:   idGenerator,
 		clock:         clock,
 	}
@@ -64,11 +64,8 @@ func (uc *StartMatchingUsecase) Execute(ctx context.Context, caseID string) (*do
 		return nil, err
 	}
 
-	if err := uc.jobEnqueuer.Enqueue(ctx, outbound.MatchingJob{
-		RunID:  runID,
-		CaseID: caseID,
-	}); err != nil {
-		_ = run.Fail("failed to enqueue matching job: "+err.Error(), uc.clock.Now())
+	if err := uc.dispatcher.DispatchMatching(ctx, runID); err != nil {
+		_ = run.Fail("failed to dispatch matching job: "+err.Error(), uc.clock.Now())
 		_ = uc.runRepository.Save(ctx, &run)
 		return nil, err
 	}

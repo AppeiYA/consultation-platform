@@ -140,24 +140,27 @@ func mapReasons(
 
 
 func mapMatchFactor(value string) (domain.MatchFactor, error) {
-	switch strings.ToUpper(strings.TrimSpace(value)) {
-
-	case "EXPERTISE":
+	v := strings.ToUpper(strings.TrimSpace(value))
+	switch {
+	case v == "EXPERTISE" || strings.Contains(v, "EXPERT") || strings.Contains(v, "SKILL"):
 		return domain.MatchFactorExpertise, nil
 
-	case "EXPERIENCE":
+	case v == "EXPERIENCE" || strings.Contains(v, "EXPERIEN") || strings.Contains(v, "YEAR"):
 		return domain.MatchFactorExperience, nil
 
-	case "CATEGORY":
+	case v == "CATEGORY" || strings.Contains(v, "CATEGOR") || strings.Contains(v, "PROFESSION"):
 		return domain.MatchFactorCategory, nil
 
-	case "LANGUAGE":
+	case v == "AVAILABILITY" || strings.Contains(v, "AVAIL"):
+		return domain.MatchFactorAvailability, nil
+
+	case v == "LANGUAGE" || strings.Contains(v, "LANG"):
 		return domain.MatchFactorLanguage, nil
 
+	case v == "VERIFICATION" || strings.Contains(v, "VERIF"):
+		return domain.MatchFactorVerification, nil
+
 	default:
-		return "", fmt.Errorf(
-			"unsupported match factor %q",
-			value,
-		)
+		return domain.MatchFactorCategory, nil
 	}
 }

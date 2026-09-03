@@ -6,27 +6,32 @@ import (
 	"github.com/AppeiYA/consultation-platform/internal/consultationcase/domain"
 	"github.com/AppeiYA/consultation-platform/internal/consultationcase/ports/outbound"
 	"github.com/AppeiYA/consultation-platform/internal/consultationcase/usecase/dto"
+	"github.com/AppeiYA/consultation-platform/internal/shared/logger"
 	shared_outbound "github.com/AppeiYA/consultation-platform/internal/shared/ports/outbound"
+	"go.uber.org/zap"
 )
 
 type CreateCaseUsecase struct {
-	caseRepository outbound.CaseRepository
-	idGenerator shared_outbound.IdentifierGenerator
-	clientVerifier outbound.ClientVerifier
-	clock shared_outbound.Clock
+	caseRepository  outbound.CaseRepository
+	idGenerator     shared_outbound.IdentifierGenerator
+	clientVerifier  outbound.ClientVerifier
+	matchingStarter outbound.MatchingStarter
+	clock           shared_outbound.Clock
 }
 
 func NewCreateCaseUsecase(
 	caseRepository outbound.CaseRepository,
 	idGenerator shared_outbound.IdentifierGenerator,
 	clientVerifier outbound.ClientVerifier,
+	matchingStarter outbound.MatchingStarter,
 	clock shared_outbound.Clock,
 ) *CreateCaseUsecase {
 	return &CreateCaseUsecase{
-		caseRepository: caseRepository,
-		idGenerator: idGenerator,
-		clientVerifier: clientVerifier,
-		clock: clock,
+		caseRepository:  caseRepository,
+		idGenerator:     idGenerator,
+		clientVerifier:  clientVerifier,
+		matchingStarter: matchingStarter,
+		clock:           clock,
 	}
 }
 
@@ -72,6 +77,22 @@ func (uc *CreateCaseUsecase) Execute(ctx context.Context, clientID string, req *
 	// save the new case to the repository
 	if err := uc.caseRepository.SaveCase(ctx, newCase); err != nil {
 		return err
+	}
+
+	// auto-trigger matching if a matching starter is configured
+	if uc.matchingStarter != nil {
+		if err := uc.matchingStarter.StartMatching(ctx, caseID); err != nil {
+			logger.Warn(
+				"failed to auto-trigger matching on case creation",
+				zap.Error(err),
+				zap.String("case_id", caseID),
+			)
+		} else {
+			logger.Info(
+				"successfully auto-triggered matching on case creation",
+				zap.String("case_id", caseID),
+			)
+		}
 	}
 
 	return nil

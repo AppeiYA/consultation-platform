@@ -53,7 +53,10 @@ type RedisConfig struct {
 	Password string
 	DB int
 }
-type AIConfig struct {}
+type AIConfig struct {
+	GeminiAPIKey string
+	GeminiModel  string
+}
 type PaymentConfig struct {}
 type LoggerConfig struct {
 	LogLevel       Level

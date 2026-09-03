@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestExecuteMatchingUsecase(t *testing.T) {
+func TestProcessMatchingUsecase(t *testing.T) {
 	ctx := context.Background()
 	now := time.Date(2026, 8, 26, 12, 0, 0, 0, time.UTC)
 	cat, _ := domain.NewMatchingCategory("Software Engineering")
@@ -25,7 +25,7 @@ func TestExecuteMatchingUsecase(t *testing.T) {
 		*mocks.MockCandidateRanker,
 		*mocks.MockMatchingRunRepository,
 		*shared_mocks.MockClock,
-		*ExecuteMatchingUsecase,
+		*ProcessMatchingUsecase,
 	) {
 		caseReader := &mocks.MockCaseReader{}
 		candidateGen := &mocks.MockCandidateGenerator{}
@@ -35,7 +35,7 @@ func TestExecuteMatchingUsecase(t *testing.T) {
 			NowFn: func() time.Time { return now },
 		}
 
-		uc := NewExecuteMatchingUsecase(
+		uc := NewProcessMatchingUsecase(
 			caseReader,
 			candidateGen,
 			candidateRanker,
@@ -89,20 +89,50 @@ func TestExecuteMatchingUsecase(t *testing.T) {
 			return nil
 		}
 
-		result, err := uc.Execute(ctx, "mrun_001")
+		err := uc.Execute(ctx, "mrun_001")
 
 		require.NoError(t, err)
-		require.NotNil(t, result)
-		require.Equal(t, "mrun_001", result.ID())
-		require.Equal(t, domain.RunStatusCompleted, result.Status())
-		require.True(t, result.IsCompleted())
-		require.Len(t, result.Candidates(), 2)
-		require.Equal(t, savedRun, result)
+		require.NotNil(t, savedRun)
+		require.Equal(t, "mrun_001", savedRun.ID())
+		require.Equal(t, domain.RunStatusCompleted, savedRun.Status())
+		require.True(t, savedRun.IsCompleted())
+		require.Len(t, savedRun.Candidates(), 2)
+	})
+
+	t.Run("idempotency: no-op when run is already completed", func(t *testing.T) {
+		caseReader, candidateGen, candidateRanker, runRepo, _, uc := setup()
+
+		run, _ := domain.NewMatchingRun("mrun_done", "case_001", rankingVer, now)
+		_ = run.StartGeneration()
+		_ = run.StartRanking()
+		_ = run.Complete([]domain.RankedCandidate{}, now)
+
+		runRepo.FindByIDFn = func(ctx context.Context, id string) (*domain.MatchingRun, error) {
+			return &run, nil
+		}
+
+		// These should NOT be called
+		caseReaderCalled := false
+		caseReader.GetCaseDetailsFn = func(ctx context.Context, caseID string) (*outbound.CaseDetails, error) {
+			caseReaderCalled = true
+			return nil, nil
+		}
+		candidateGenCalled := false
+		candidateGen.GenerateCandidatesFn = func(ctx context.Context, criteria domain.CandidateGenerationCriteria) (domain.CandidatePool, error) {
+			candidateGenCalled = true
+			return domain.CandidatePool{}, nil
+		}
+
+		err := uc.Execute(ctx, "mrun_done")
+		require.NoError(t, err)
+		require.False(t, caseReaderCalled)
+		require.False(t, candidateGenCalled)
+		require.Nil(t, candidateRanker.RankFn)
 	})
 
 	t.Run("should reject empty run ID", func(t *testing.T) {
 		_, _, _, _, _, uc := setup()
-		_, err := uc.Execute(ctx, "")
+		err := uc.Execute(ctx, "")
 		require.Equal(t, domain.ErrInvalidMatchingRunID, err)
 	})
 
@@ -112,7 +142,7 @@ func TestExecuteMatchingUsecase(t *testing.T) {
 			return nil, errors.New("run not found")
 		}
 
-		_, err := uc.Execute(ctx, "mrun_404")
+		err := uc.Execute(ctx, "mrun_404")
 		require.Error(t, err)
 		require.Equal(t, "run not found", err.Error())
 	})
@@ -137,7 +167,7 @@ func TestExecuteMatchingUsecase(t *testing.T) {
 			return nil
 		}
 
-		_, err := uc.Execute(ctx, "mrun_fail_gen")
+		err := uc.Execute(ctx, "mrun_fail_gen")
 		require.Error(t, err)
 		require.Equal(t, "generator database error", err.Error())
 		require.NotNil(t, savedRun)
@@ -169,7 +199,7 @@ func TestExecuteMatchingUsecase(t *testing.T) {
 			return nil
 		}
 
-		_, err := uc.Execute(ctx, "mrun_fail_rank")
+		err := uc.Execute(ctx, "mrun_fail_rank")
 		require.Error(t, err)
 		require.Equal(t, "ranking model timeout", err.Error())
 		require.NotNil(t, savedRun)
@@ -193,13 +223,16 @@ func TestExecuteMatchingUsecase(t *testing.T) {
 		candidateRanker.RankFn = func(ctx context.Context, req outbound.RankingRequest) ([]domain.RankedCandidate, error) {
 			return []domain.RankedCandidate{}, nil
 		}
+		var savedRun *domain.MatchingRun
 		runRepo.SaveFn = func(ctx context.Context, r *domain.MatchingRun) error {
+			savedRun = r
 			return nil
 		}
 
-		result, err := uc.Execute(ctx, "mrun_empty")
+		err := uc.Execute(ctx, "mrun_empty")
 		require.NoError(t, err)
-		require.Equal(t, domain.RunStatusCompleted, result.Status())
-		require.Empty(t, result.Candidates())
+		require.NotNil(t, savedRun)
+		require.Equal(t, domain.RunStatusCompleted, savedRun.Status())
+		require.Empty(t, savedRun.Candidates())
 	})
 }

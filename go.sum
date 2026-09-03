@@ -246,6 +246,8 @@ github.com/hashicorp/memberlist v0.6.0 h1:hhVDLQUzWkLaitLLSrxLLqSD2l2+qiOz1DMr5z
 github.com/hashicorp/memberlist v0.6.0/go.mod h1:a2lqh8KICpm8JibWOmuld7DaA+9QU1YcUtTTTMAtt/M=
 github.com/hashicorp/serf v0.10.4 h1:TCQOrJXHZ1Xf80c4WBhMM9OwUFgDaIP0R+YvoQUKadI=
 github.com/hashicorp/serf v0.10.4/go.mod h1:l+s5Q1OSPWU6b9l9m7ODJzTp7mLevSaVzAI03Nka2F0=
+github.com/hibiken/asynq v0.26.0 h1:1Zxr92MlDnb1Zt/QR5g2vSCqUS03i95lUfqx5X7/wrw=
+github.com/hibiken/asynq v0.26.0/go.mod h1:Qk4e57bTnWDoyJ67VkchuV6VzSM9IQW2nPvAGuDyw58=
 github.com/ishidawataru/sctp v0.0.0-20251114114122-19ddcbc6aae2 h1:36qep4gxKs+JgeHGWeQ040RyZdt9kQlLglL1rFVn/oQ=
 github.com/ishidawataru/sctp v0.0.0-20251114114122-19ddcbc6aae2/go.mod h1:co9pwDoBCm1kGxawmb4sPq0cSIOOWNPT4KnHotMP1Zg=
 github.com/jmoiron/sqlx v1.4.0 h1:1PLqN7S1UYp5t4SrVVnt4nUVNemrDAtxlulVe+Qgm3o=
@@ -376,6 +378,8 @@ github.com/redis/go-redis/v9 v9.21.0 h1:FPBE4hhbAke+TLmcY3WkpbDffJEomdqPn3HYiqAt
 github.com/redis/go-redis/v9 v9.21.0/go.mod h1:v/M13XI1PVCDcm01VtPFOADfZtHf8YW3baQf57KlIkA=
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
+github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=
+github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/rootless-containers/rootlesskit/v2 v2.3.6 h1:m/26nAx0DbHZYaM46+uoQjfpu9G77QLzWj2jz25chO8=
@@ -386,6 +390,8 @@ github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPx
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
 github.com/sirupsen/logrus v1.9.4 h1:TsZE7l11zFCLZnZ+teH4Umoq5BhEIfIzfRDZ1Uzql2w=
 github.com/sirupsen/logrus v1.9.4/go.mod h1:ftWc9WdOfJ0a92nsE2jF5u5ZwH8Bv2zdeOC42RjbV2g=
+github.com/spf13/cast v1.10.0 h1:h2x0u2shc1QuLHfxi+cTJvs30+ZAHOGRic8uyGTDWxY=
+github.com/spf13/cast v1.10.0/go.mod h1:jNfB8QC9IA6ZuY2ZjDp0KtFO2LZZlg4S/7bzP6qqeHo=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=

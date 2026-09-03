@@ -21,7 +21,7 @@ var validTransitions = map[RunStatus][]RunStatus{
 	RunStatusGenerating: {RunStatusRanking, RunStatusFailed, RunStatusCancelled},
 	RunStatusRanking:   {RunStatusCompleted, RunStatusFailed, RunStatusCancelled},
 	RunStatusCompleted: {},
-	RunStatusFailed:    {},
+	RunStatusFailed:    {RunStatusGenerating},
 	RunStatusCancelled: {},
 }
 

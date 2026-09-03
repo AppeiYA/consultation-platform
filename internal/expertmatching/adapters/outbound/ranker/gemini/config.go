@@ -26,6 +26,14 @@ func rankingConfig() *genai.GenerateContentConfig {
 									"properties": map[string]any{
 										"factor": map[string]any{
 											"type": "string",
+											"enum": []string{
+												"expertise",
+												"experience",
+												"category",
+												"availability",
+												"language",
+												"verification",
+											},
 										},
 										"detail": map[string]any{
 											"type": "string",

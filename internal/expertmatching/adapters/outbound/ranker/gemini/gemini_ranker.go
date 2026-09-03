@@ -7,6 +7,7 @@ import (
 	"github.com/AppeiYA/consultation-platform/internal/expertmatching/domain"
 	"github.com/AppeiYA/consultation-platform/internal/expertmatching/ports/outbound"
 	geminiclient "github.com/AppeiYA/consultation-platform/internal/shared/adapters/gemini"
+	httpx "github.com/AppeiYA/consultation-platform/internal/shared/adapters/http/client"
 	"google.golang.org/genai"
 )
 
@@ -18,6 +19,18 @@ func NewCandidateRanker(client *geminiclient.Client) *CandidateRanker {
 	return &CandidateRanker{
 		client: client,
 	}
+}
+
+func New(ctx context.Context, apiKey, model string) (*CandidateRanker, error) {
+	httpClient := httpx.NewClient()
+	client, err := geminiclient.NewClient(ctx, httpClient, geminiclient.Config{
+		APIKey: apiKey,
+		Model:  model,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return NewCandidateRanker(client), nil
 }
 
 func (r *CandidateRanker) Rank(

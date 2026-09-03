@@ -17,6 +17,14 @@ func SetupConfig() *Config {
 		Logger:   loggerConfig(),
 		Database: databaseConfig(),
 		Redis:    redisConfig(),
+		AI:       aiConfig(),
+	}
+}
+
+func aiConfig() AIConfig {
+	return AIConfig{
+		GeminiAPIKey: getEnv("GEMINI_API_KEY", ""),
+		GeminiModel:  getEnv("GEMINI_MODEL", "gemini-2.5-flash"),
 	}
 }
 

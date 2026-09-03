@@ -97,12 +97,13 @@ func ReconstituteMatchingRun(
 
 // --- Lifecycle Transitions ---
 
-// StartGeneration transitions run from PENDING -> GENERATING
+// StartGeneration transitions run from PENDING -> GENERATING (or retries from FAILED -> GENERATING)
 func (mr *MatchingRun) StartGeneration() error {
 	if !mr.status.CanTransitionTo(RunStatusGenerating) {
 		return ErrInvalidRunStatusTransition
 	}
 	mr.status = RunStatusGenerating
+	mr.failureReason = ""
 	return nil
 }
 

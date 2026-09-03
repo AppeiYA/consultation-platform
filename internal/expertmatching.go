@@ -6,35 +6,40 @@ import (
 	consultant_adapter "github.com/AppeiYA/consultation-platform/internal/expertmatching/adapters/outbound/external/consultant"
 	consultationcase_adapter "github.com/AppeiYA/consultation-platform/internal/expertmatching/adapters/outbound/external/consultationcase"
 	expertMatchingRepo "github.com/AppeiYA/consultation-platform/internal/expertmatching/adapters/outbound/postgres/expertmatching"
-	// "github.com/AppeiYA/consultation-platform/internal/expertmatching/adapters/outbound/ranker"
+	"github.com/AppeiYA/consultation-platform/internal/expertmatching/adapters/outbound/ranker"
 	geminiranker "github.com/AppeiYA/consultation-platform/internal/expertmatching/adapters/outbound/ranker/gemini"
-	redis_adapter "github.com/AppeiYA/consultation-platform/internal/expertmatching/adapters/outbound/redis"
+	matching_worker "github.com/AppeiYA/consultation-platform/internal/expertmatching/adapters/worker"
+	"github.com/AppeiYA/consultation-platform/internal/expertmatching/ports/outbound"
 	geminiclient "github.com/AppeiYA/consultation-platform/internal/shared/adapters/gemini"
 	"github.com/AppeiYA/consultation-platform/internal/shared/db"
 	shared_outbound "github.com/AppeiYA/consultation-platform/internal/shared/ports/outbound"
-	"github.com/AppeiYA/consultation-platform/internal/shared/redis"
+	"github.com/hibiken/asynq"
 )
 
 func (a *App) registerExpertMatchingModule(
 	repository db.Repository,
-	redisClient *redis.Redis,
+	asynqClient *asynq.Client,
 	clock shared_outbound.Clock,
 	idGenerator shared_outbound.IdentifierGenerator,
 	geminiClient *geminiclient.Client,
 ) {
 	caseReader := consultationcase_adapter.NewCaseReaderAdapter(&repository)
 	candidateGen := consultant_adapter.NewCandidateGeneratorAdapter(&repository)
-	geminiRanker := geminiranker.NewCandidateRanker(geminiClient)
-	// candidateRanker := ranker.NewRuleBasedRanker()
+
+	var candidateRanker outbound.CandidateRanker = ranker.NewRuleBasedRanker()
+	if geminiClient != nil {
+		candidateRanker = geminiranker.NewCandidateRanker(geminiClient)
+	}
+
 	runRepo := expertMatchingRepo.NewExpertMatchingRepository(&repository)
-	jobEnqueuer := redis_adapter.NewRedisMatchingJobEnqueuer(redisClient)
+	dispatcher := matching_worker.NewMatchingJobDispatcher(asynqClient)
 
 	a.expertMatchingModule = expertmatching.NewModule(
 		caseReader,
 		candidateGen,
-		geminiRanker,
+		candidateRanker,
 		runRepo,
-		jobEnqueuer,
+		dispatcher,
 		idGenerator,
 		clock,
 	)

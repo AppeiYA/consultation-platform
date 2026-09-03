@@ -67,6 +67,7 @@ func setUpConsultationCaseApp(t *testing.T) *TestHarness {
 	caseModule := consultationcase.NewModule(
 		caseRepo,
 		clientVerifier,
+		nil,
 		idGenerator,
 		clock,
 	)

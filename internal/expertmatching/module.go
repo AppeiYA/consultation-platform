@@ -9,7 +9,7 @@ import (
 
 type Module struct {
 	StartMatching     inbound.StartMatchingInt
-	ExecuteMatching   inbound.ExecuteMatchingInt
+	ProcessMatching   inbound.ProcessMatchingInt
 	GetMatchingResult inbound.GetMatchingResultInt
 }
 
@@ -18,7 +18,7 @@ func NewModule(
 	candidateGenerator outbound.CandidateGenerator,
 	candidateRanker outbound.CandidateRanker,
 	runRepository outbound.MatchingRunRepository,
-	jobEnqueuer outbound.MatchingJobEnqueuer,
+	dispatcher outbound.MatchingJobDispatcher,
 	idGenerator shared_outbound.IdentifierGenerator,
 	clock shared_outbound.Clock,
 ) *Module {
@@ -26,11 +26,11 @@ func NewModule(
 		StartMatching: usecase.NewStartMatchingUsecase(
 			caseReader,
 			runRepository,
-			jobEnqueuer,
+			dispatcher,
 			idGenerator,
 			clock,
 		),
-		ExecuteMatching: usecase.NewExecuteMatchingUsecase(
+		ProcessMatching: usecase.NewProcessMatchingUsecase(
 			caseReader,
 			candidateGenerator,
 			candidateRanker,

@@ -21,14 +21,14 @@ func TestStartMatchingUsecase(t *testing.T) {
 	setup := func() (
 		*mocks.MockCaseReader,
 		*mocks.MockMatchingRunRepository,
-		*mocks.MockMatchingJobEnqueuer,
+		*mocks.MockMatchingJobDispatcher,
 		*shared_mocks.MockIDGenerator,
 		*shared_mocks.MockClock,
 		*StartMatchingUsecase,
 	) {
 		caseReader := &mocks.MockCaseReader{}
 		runRepo := &mocks.MockMatchingRunRepository{}
-		jobEnqueuer := &mocks.MockMatchingJobEnqueuer{}
+		dispatcher := &mocks.MockMatchingJobDispatcher{}
 		idGen := &shared_mocks.MockIDGenerator{}
 		clock := &shared_mocks.MockClock{
 			NowFn: func() time.Time { return now },
@@ -37,15 +37,15 @@ func TestStartMatchingUsecase(t *testing.T) {
 		uc := NewStartMatchingUsecase(
 			caseReader,
 			runRepo,
-			jobEnqueuer,
+			dispatcher,
 			idGen,
 			clock,
 		)
-		return caseReader, runRepo, jobEnqueuer, idGen, clock, uc
+		return caseReader, runRepo, dispatcher, idGen, clock, uc
 	}
 
-	t.Run("successful initiation of matching run and enqueuing job", func(t *testing.T) {
-		caseReader, runRepo, jobEnqueuer, idGen, _, uc := setup()
+	t.Run("successful initiation of matching run and dispatching job", func(t *testing.T) {
+		caseReader, runRepo, dispatcher, idGen, _, uc := setup()
 
 		caseReader.GetCaseDetailsFn = func(ctx context.Context, caseID string) (*outbound.CaseDetails, error) {
 			return &outbound.CaseDetails{
@@ -67,9 +67,9 @@ func TestStartMatchingUsecase(t *testing.T) {
 			return nil
 		}
 
-		var enqueuedJob *outbound.MatchingJob
-		jobEnqueuer.EnqueueFn = func(ctx context.Context, job outbound.MatchingJob) error {
-			enqueuedJob = &job
+		var dispatchedRunID string
+		dispatcher.DispatchMatchingFn = func(ctx context.Context, runID string) error {
+			dispatchedRunID = runID
 			return nil
 		}
 
@@ -82,9 +82,7 @@ func TestStartMatchingUsecase(t *testing.T) {
 		require.Equal(t, domain.RunStatusPending, result.Status())
 		require.Equal(t, savedRun, result)
 
-		require.NotNil(t, enqueuedJob)
-		require.Equal(t, "mrun_abc123", enqueuedJob.RunID)
-		require.Equal(t, "case_001", enqueuedJob.CaseID)
+		require.Equal(t, "mrun_abc123", dispatchedRunID)
 	})
 
 	t.Run("should reject empty case ID", func(t *testing.T) {
@@ -104,8 +102,8 @@ func TestStartMatchingUsecase(t *testing.T) {
 		require.Equal(t, "case not found", err.Error())
 	})
 
-	t.Run("should record failure and return error when job enqueuer fails", func(t *testing.T) {
-		caseReader, runRepo, jobEnqueuer, idGen, _, uc := setup()
+	t.Run("should record failure and return error when job dispatcher fails", func(t *testing.T) {
+		caseReader, runRepo, dispatcher, idGen, _, uc := setup()
 
 		caseReader.GetCaseDetailsFn = func(ctx context.Context, caseID string) (*outbound.CaseDetails, error) {
 			return &outbound.CaseDetails{CaseID: caseID, Category: cat}, nil
@@ -116,7 +114,7 @@ func TestStartMatchingUsecase(t *testing.T) {
 		runRepo.SaveFn = func(ctx context.Context, run *domain.MatchingRun) error {
 			return nil
 		}
-		jobEnqueuer.EnqueueFn = func(ctx context.Context, job outbound.MatchingJob) error {
+		dispatcher.DispatchMatchingFn = func(ctx context.Context, runID string) error {
 			return errors.New("redis connection timeout")
 		}
 

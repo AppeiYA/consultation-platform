@@ -96,6 +96,7 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hashicorp/memberlist v0.6.0 // indirect
 	github.com/hashicorp/serf v0.10.4 // indirect
+	github.com/hibiken/asynq v0.26.0 // indirect
 	github.com/ishidawataru/sctp v0.0.0-20251114114122-19ddcbc6aae2 // indirect
 	github.com/klauspost/compress v1.19.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -131,9 +132,11 @@ require (
 	github.com/prometheus/common v0.67.5 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rootless-containers/rootlesskit/v2 v2.3.6 // indirect
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
+	github.com/spf13/cast v1.10.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect

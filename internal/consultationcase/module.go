@@ -18,6 +18,7 @@ type Module struct {
 func NewModule(
 	caseRepo outbound.CaseRepository,
 	clientVerifier outbound.ClientVerifier,
+	matchingStarter outbound.MatchingStarter,
 	idGenerator shared_outbound.IdentifierGenerator,
 	clock shared_outbound.Clock,
 ) *Module {
@@ -26,6 +27,7 @@ func NewModule(
 			caseRepo,
 			idGenerator,
 			clientVerifier,
+			matchingStarter,
 			clock,
 		),
 		GetCase: usecase.NewGetCaseUsecase(caseRepo),

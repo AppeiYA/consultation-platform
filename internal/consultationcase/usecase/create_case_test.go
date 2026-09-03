@@ -14,10 +14,11 @@ import (
 )
 
 type testCreateCase struct {
-	caseRepo       *mocks.MockCaseRepository
-	clientVerifier *mocks.MockClientVerifier
-	idGenerator    *shared_mocks.MockIDGenerator
-	clock          *shared_mocks.MockClock
+	caseRepo        *mocks.MockCaseRepository
+	clientVerifier  *mocks.MockClientVerifier
+	matchingStarter *mocks.MockMatchingStarter
+	idGenerator     *shared_mocks.MockIDGenerator
+	clock           *shared_mocks.MockClock
 
 	sut *CreateCaseUsecase
 }
@@ -35,6 +36,11 @@ func setUpCreateCase(t *testing.T) *testCreateCase {
 			return nil
 		},
 	}
+	matchingStarter := &mocks.MockMatchingStarter{
+		StartMatchingFn: func(ctx context.Context, caseID string) error {
+			return nil
+		},
+	}
 	idGenerator := &shared_mocks.MockIDGenerator{
 		GenerateFn: func(prefix string) (string, error) {
 			return "case_123456", nil
@@ -46,14 +52,15 @@ func setUpCreateCase(t *testing.T) *testCreateCase {
 		},
 	}
 
-	sut := NewCreateCaseUsecase(caseRepo, idGenerator, clientVerifier, clock)
+	sut := NewCreateCaseUsecase(caseRepo, idGenerator, clientVerifier, matchingStarter, clock)
 
 	return &testCreateCase{
-		caseRepo:       caseRepo,
-		clientVerifier: clientVerifier,
-		idGenerator:    idGenerator,
-		clock:          clock,
-		sut:            sut,
+		caseRepo:        caseRepo,
+		clientVerifier:  clientVerifier,
+		matchingStarter: matchingStarter,
+		idGenerator:     idGenerator,
+		clock:           clock,
+		sut:             sut,
 	}
 }
 
@@ -157,5 +164,18 @@ func TestCreateCaseUsecase(t *testing.T) {
 		err := tc.sut.Execute(ctx, "user_123", validReq)
 		require.Error(t, err)
 		require.Equal(t, dbErr, err)
+	})
+
+	t.Run("should auto-trigger matching when case is created", func(t *testing.T) {
+		tc := setUpCreateCase(t)
+		var triggeredCaseID string
+		tc.matchingStarter.StartMatchingFn = func(ctx context.Context, caseID string) error {
+			triggeredCaseID = caseID
+			return nil
+		}
+
+		err := tc.sut.Execute(ctx, "user_123", validReq)
+		require.NoError(t, err)
+		require.Equal(t, "case_123456", triggeredCaseID)
 	})
 }
